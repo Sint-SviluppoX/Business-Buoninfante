@@ -13,10 +13,10 @@ Public Class CLH__CLIE
     Try
       Dim strSQL As String = "SELECT TOP 1 codditt, dd_conto, dd_coddest FROM DESTDIV" &
                              " WHERE dd_hhCodDestExc = " & nCodiceEsterno.ToString() &
-                             " AND NOT (codditt = " & CStrSQL(strDitta) &
+                             " AND codditt = " & CStrSQL(strDitta) &
                              " AND dd_conto = " & nConto.ToString() &
-                             " AND dd_coddest = " & nCodDest.ToString() & ")" &
-                             " ORDER BY codditt, dd_conto, dd_coddest"
+                             " AND dd_coddest <> " & nCodDest.ToString() &
+                             " ORDER BY dd_coddest"
       Return OpenRecordset(strSQL, CLE__APP.DBTIPO.DBAZI)
     Catch ex As Exception
       CLN__STD.GestErr(ex, Me, "")

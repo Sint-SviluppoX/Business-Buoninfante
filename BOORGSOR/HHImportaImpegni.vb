@@ -1,5 +1,6 @@
 Imports System.Data
-Imports System.Data.OleDb
+Imports System.IO
+Imports ExcelDataReader
 Imports NTSInformatica.CLN__STD
 
 'Dati minimi estratti da una riga del file Excel.
@@ -122,6 +123,11 @@ Friend Class HH_ImportatoreImpegni
                                 indiceRiga + 1, documento.Righe.Count))
             Next
 
+            If Not ordine.HaRigheValide() Then
+                motivo = "documento privo di righe valide: salvataggio annullato"
+                Return False
+            End If
+
             ordine.AggiungiNote(noteNonBloccanti)
             MostraAvanzamento("Impegno " & indiceDocumento.ToString() & " di " &
         totaleDocumenti.ToString() & " (" & documento.Riferimento & "): salvataggio...",
@@ -146,10 +152,11 @@ Friend Class HH_ImportatoreImpegni
                                   ByRef dataConsegna As Nullable(Of Date),
                                   ByVal noteNonBloccanti As List(Of String))
         Try
+            codDest = 0
             Dim risultato As DataTable = _oClfGsor.GetDestinazioneImport(codDestEsterno.ToString(), conto)
             If risultato Is Nothing OrElse risultato.Rows.Count = 0 Then
-                'Il codice esterno 302 identifica la destinazione principale (DESTDIV 0).
-                If codDestEsterno = 302 Then codDest = 0
+                noteNonBloccanti.Add("Destinazione esterna " & codDestEsterno.ToString() &
+                                     " non trovata: utilizzata la destinazione principale (0).")
                 Return
             End If
 
@@ -164,6 +171,10 @@ Friend Class HH_ImportatoreImpegni
             End If
         Catch ex As Exception
             CLN__STD.GestErr(ex, Me, "")
+            codDest = 0
+            noteNonBloccanti.Add("Errore nella ricerca della destinazione esterna " &
+                                 codDestEsterno.ToString() &
+                                 ": utilizzata la destinazione principale (0).")
         End Try
     End Sub
 
@@ -335,22 +346,32 @@ Friend Class HH_ImportatoreImpegni
     Private Function LeggiExcel(ByVal percorsoFile As String) As DataTable
         Dim risultato As New DataTable()
         Try
-            Dim connectionString As String =
-        "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" & percorsoFile &
-        ";Extended Properties='Excel 8.0;HDR=No;IMEX=1'"
+            Using flusso As FileStream = File.Open(percorsoFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+                Using lettore As IExcelDataReader = ExcelReaderFactory.CreateReader(flusso)
+                    Dim foglioTrovato As Boolean = False
+                    Do
+                        If String.Equals(lettore.Name, "faxb2b", StringComparison.OrdinalIgnoreCase) Then
+                            foglioTrovato = True
+                            Exit Do
+                        End If
+                    Loop While lettore.NextResult()
 
-            Using connessione As New OleDbConnection(connectionString)
-                connessione.Open()
-                Dim schema As DataTable = connessione.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, Nothing)
-                If schema Is Nothing OrElse schema.Rows.Count = 0 Then
-                    Throw New Exception("Il file Excel non contiene fogli leggibili.")
-                End If
+                    If Not foglioTrovato Then
+                        Throw New Exception("Il file Excel non contiene il foglio richiesto 'faxb2b'.")
+                    End If
 
-                Dim nomeFoglio As String = NTSCStr(schema.Rows(0)!TABLE_NAME)
-                Using comando As New OleDbCommand("SELECT * FROM [" & nomeFoglio.Replace("]", "]]") & "]", connessione)
-                    Using adattatore As New OleDbDataAdapter(comando)
-                        adattatore.Fill(risultato)
-                    End Using
+                    For indiceColonna As Integer = 0 To lettore.FieldCount - 1
+                        risultato.Columns.Add("F" & indiceColonna.ToString(), GetType(Object))
+                    Next
+
+                    While lettore.Read()
+                        Dim riga As DataRow = risultato.NewRow()
+                        For indiceColonna As Integer = 0 To lettore.FieldCount - 1
+                            Dim valore As Object = lettore.GetValue(indiceColonna)
+                            riga(indiceColonna) = If(valore Is Nothing, DBNull.Value, valore)
+                        Next
+                        risultato.Rows.Add(riga)
+                    End While
                 End Using
             End Using
 
@@ -532,6 +553,22 @@ Friend Class HH_CreatoreImpegno
         Catch ex As Exception
             CLN__STD.GestErr(ex, Me, "")
             UltimoErrore = ex.Message
+            Return False
+        End Try
+    End Function
+
+    Public Function HaRigheValide() As Boolean
+        Try
+            If _oCleGsor Is Nothing OrElse _oCleGsor.dttEC Is Nothing OrElse
+               Not _oCleGsor.dttEC.Columns.Contains("ec_codart") Then Return False
+
+            For Each riga As DataRow In _oCleGsor.dttEC.Rows
+                If riga.RowState <> DataRowState.Deleted AndAlso
+                   Not String.IsNullOrWhiteSpace(NTSCStr(riga!ec_codart)) Then Return True
+            Next
+            Return False
+        Catch ex As Exception
+            CLN__STD.GestErr(ex, Me, "")
             Return False
         End Try
     End Function

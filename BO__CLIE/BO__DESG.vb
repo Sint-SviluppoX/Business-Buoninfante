@@ -6,63 +6,63 @@ Public Class FRO__DESG
 
 #Region "Controlli importazione impegni"
 
-  Private fmhhImportazioneImpegni As NTSGroupBox
-  Private lbhhCodDestExc As NTSLabel
-  Private WithEvents edhhCodDestExc As NTSTextBoxNum
-  Private lbhhGiornoConsegna As NTSLabel
-  Private WithEvents cbhhGiornoConsegna As NTSComboBox
+  Private fm_hhImpExc As NTSGroupBox
+  Private lb_hhCodDestExc As NTSLabel
+  Private WithEvents ed_hhCodDestExc As NTSTextBoxNum
+  Private lb_hhGiornoConsegna As NTSLabel
+  Private WithEvents cb_hhGiornoConsegna As NTSComboBox
 
   Public Overrides Sub InitializeComponent()
     Try
       MyBase.InitializeComponent()
 
-      fmhhImportazioneImpegni = New NTSGroupBox With {
-        .Name = "fmhhImportazioneImpegni",
-        .Text = "IMPORTAZIONE IMPEGNI",
+            fm_hhImpExc = New NTSGroupBox With {
+        .Name = "fm_hhImpExc",
+        .Text = "IMPORT EXCEL",
         .Left = 4,
-        .Top = 136,
-        .Width = 448,
-        .Height = 92,
-        .Tile = False
+        .Top = 516,
+        .Width = 456,
+        .Height = 120,
+        .Tile = True
       }
 
-      lbhhCodDestExc = CreaEtichetta("lbhhCodDestExc", "Codice destinazione Excel", 4, 28)
-      edhhCodDestExc = New NTSTextBoxNum With {
-        .Name = "edhhCodDestExc",
-        .Left = 172,
+            lb_hhCodDestExc = CreaEtichetta("lb_hhCodDestExc", "Codice destinazione excel", 4, 28, 132)
+            ed_hhCodDestExc = New NTSTextBoxNum With {
+        .Name = "ed_hhCodDestExc",
+        .Left = 144,
         .Top = 28,
-        .Width = 272
+        .Width = 40
       }
 
-      lbhhGiornoConsegna = CreaEtichetta("lbhhGiornoConsegna", "Giorno di consegna", 4, 52)
-      cbhhGiornoConsegna = New NTSComboBox With {
-        .Name = "cbhhGiornoConsegna",
-        .Left = 172,
-        .Top = 52,
-        .Width = 272
+            lb_hhGiornoConsegna = CreaEtichetta("lb_hhGiornoConsegna", "Giorno consegna", 4, 56, 88)
+            cb_hhGiornoConsegna = New NTSComboBox With {
+        .Name = "cb_hhGiornoConsegna",
+        .Left = 100,
+        .Top = 56,
+        .Width = 100
       }
 
-      fmhhImportazioneImpegni.Controls.AddRange(New Control() {
-        lbhhCodDestExc, edhhCodDestExc, lbhhGiornoConsegna, cbhhGiornoConsegna
+            fm_hhImpExc.Controls.AddRange(New Control() {
+        lb_hhCodDestExc, ed_hhCodDestExc, lb_hhGiornoConsegna, cb_hhGiornoConsegna
       })
 
-            'DATI PRINCIPALI 2 appartiene alla prima NTSTabPage di FRM__DESG.
-            flPrincipale.Controls.Add(fmhhImportazioneImpegni)
-            fmhhImportazioneImpegni.BringToFront()
-    Catch ex As Exception
-      CLN__STD.GestErr(ex, Me, "")
+            'L'editor NTS registra il gruppo nella pagina "Altri dati".
+            flAltriDati.Controls.Add(fm_hhImpExc)
+        Catch ex As Exception
+            CLN__STD.GestErr(ex, Me, "")
     End Try
   End Sub
 
   Private Function CreaEtichetta(ByVal nome As String, ByVal testo As String,
-                                 ByVal x As Integer, ByVal y As Integer) As NTSLabel
+                                 ByVal x As Integer, ByVal y As Integer,
+                                 ByVal larghezza As Integer) As NTSLabel
     Try
       Return New NTSLabel With {
         .Name = nome,
         .Text = testo,
         .Left = x,
         .Top = y,
-        .Width = 164,
+        .Width = larghezza,
         .Height = 20,
         .NTSBordeStyle = NTSLabel.NTSBorderStyle.FieldCaption,
         .UseMnemonic = False
@@ -73,44 +73,62 @@ Public Class FRO__DESG
     End Try
   End Function
 
-  Public Overrides Sub InitControls()
-    Try
-      MyBase.InitControls()
+    Public Overrides Sub InitControls()
+        Try
+            MyBase.InitControls()
 
-      edhhCodDestExc.NTSSetParam(oMenu, "Codice destinazione Excel", "0", 9, 0, 999999999)
-      cbhhGiornoConsegna.NTSSetParam("Giorno di consegna")
+            ed_hhCodDestExc.NTSSetParam(oMenu, "Codice destinazione Excel", "0", 9, 0, 999999999)
+            cb_hhGiornoConsegna.NTSSetParam("Giorno di consegna")
 
-      Dim giorni As New DataTable
-      giorni.Columns.Add("codice", GetType(String))
-      giorni.Columns.Add("descrizione", GetType(String))
-      giorni.Rows.Add("", "(Nessuno)")
-      giorni.Rows.Add("Lun", "Lunedì")
-      giorni.Rows.Add("Mar", "Martedì")
-      giorni.Rows.Add("Mer", "Mercoledì")
-      giorni.Rows.Add("Gio", "Giovedì")
-      giorni.Rows.Add("Ven", "Venerdì")
-      giorni.Rows.Add("Sab", "Sabato")
-      giorni.Rows.Add("Dom", "Domenica")
+            Dim giorni As New DataTable
+            giorni.Columns.Add("codice", GetType(String))
+            giorni.Columns.Add("descrizione", GetType(String))
+            giorni.Rows.Add("", "(Nessuno)")
+            giorni.Rows.Add("Lun", "Lunedì")
+            giorni.Rows.Add("Mar", "Martedì")
+            giorni.Rows.Add("Mer", "Mercoledì")
+            giorni.Rows.Add("Gio", "Giovedì")
+            giorni.Rows.Add("Ven", "Venerdì")
+            giorni.Rows.Add("Sab", "Sabato")
+            giorni.Rows.Add("Dom", "Domenica")
 
-      cbhhGiornoConsegna.DataSource = giorni
-      cbhhGiornoConsegna.ValueMember = "codice"
-      cbhhGiornoConsegna.DisplayMember = "descrizione"
-    Catch ex As Exception
-      CLN__STD.GestErr(ex, Me, "")
-    End Try
-  End Sub
+            cb_hhGiornoConsegna.DataSource = giorni
+            cb_hhGiornoConsegna.ValueMember = "codice"
+            cb_hhGiornoConsegna.DisplayMember = "descrizione"
+        Catch ex As Exception
+            CLN__STD.GestErr(ex, Me, "")
+        End Try
+    End Sub
 
-  Public Overrides Sub Bindcontrols()
-    Try
-      MyBase.Bindcontrols()
+    Public Overrides Sub Bindcontrols()
+        Try
+            MyBase.Bindcontrols()
 
-      edhhCodDestExc.NTSDbField = "DESTDIV.dd_hhCodDestExc"
-      cbhhGiornoConsegna.NTSDbField = "DESTDIV.dd_hhGiornoConsegna"
-      NTSFormAddDataBinding(dcDesg, fmhhImportazioneImpegni)
-    Catch ex As Exception
-      CLN__STD.GestErr(ex, Me, "")
-    End Try
-  End Sub
+            ed_hhCodDestExc.NTSDbField = "DESTDIV.dd_hhCodDestExc"
+            cb_hhGiornoConsegna.NTSDbField = "DESTDIV.dd_hhGiornoConsegna"
+            NTSFormAddDataBinding(dcDesg, fm_hhImpExc)
+        Catch ex As Exception
+            CLN__STD.GestErr(ex, Me, "")
+        End Try
+    End Sub
+
+    Protected Overrides Sub OnShown(ByVal e As EventArgs)
+        Try
+            MyBase.OnShown(e)
+
+            flAltriDati.SuspendLayout()
+
+            flAltriDati.Controls.SetChildIndex(
+              fm_hhImpExc,
+              flAltriDati.Controls.Count - 1
+            )
+
+            flAltriDati.ResumeLayout(True)
+
+        Catch ex As Exception
+            CLN__STD.GestErr(ex, Me, "")
+        End Try
+    End Sub
 
 #End Region
 

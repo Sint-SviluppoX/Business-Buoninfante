@@ -9,10 +9,10 @@
     <StartupObject>
     </StartupObject>
     <RootNamespace>NTSInformatica</RootNamespace>
-    <AssemblyName>BOORGSOR</AssemblyName>
+    <AssemblyName>BOVEBOLL</AssemblyName>
     <MyType>Windows</MyType>
     <OptionStrict>On</OptionStrict>
-    <ProjectGuid>{600D677B-D412-46FD-BCEE-70C6B326F599}</ProjectGuid>
+    <ProjectGuid>{1B1DEB17-6FE6-4553-926E-CB1F92DAEA4C}</ProjectGuid>
     <SccProjectName>
     </SccProjectName>
     <SccLocalPath>
@@ -46,14 +46,20 @@
     <NoWarn>42016,41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42353,42354,42355</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ExcelDataReader, Version=3.6.0.0, Culture=neutral, PublicKeyToken=93517dbe6a4012fa, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>lib\ExcelDataReader.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include=" BNORGSOR, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="BNVEBOLL, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="CrystalDecisions.CrystalReports.Engine, Version=12.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <HintPath>..\TEST\CrystalDecisions.CrystalReports.Engine.dll</HintPath>
+    </Reference>
+    <Reference Include="CrystalDecisions.Shared, Version=12.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304, processorArchitecture=MSIL">
+      <HintPath>..\TEST\CrystalDecisions.Shared.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\TEST\Microsoft.Office.Interop.Excel.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="BNMGDOCU, Culture=neutral, processorArchitecture=MSIL">
@@ -66,17 +72,11 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Xml" />
-    <Reference Include="Newtonsoft.Json, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-      <HintPath>..\TEST\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="BNORCONF, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="BNVEPNFA, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="BNVEBOLL, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="BNLBMENU, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
@@ -95,6 +95,10 @@
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
+    <Reference Include="BNXXFILT, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="BNXXSOCI, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
@@ -108,14 +112,6 @@
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="BNLBMENU, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="BNXXFILT, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="DevExpress.Utils.v14.2, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
@@ -126,6 +122,7 @@
       <Private>False</Private>
       <HintPath>..\TEST\DevExpress.Data.v14.2.dll</HintPath>
     </Reference>
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
@@ -138,16 +135,9 @@
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BHORGSOR.VB" />
-    <Compile Include="BFORGSOR.vb" />
-    <Compile Include="HHImportaImpegni.vb" />
-    <Compile Include="BOORGSOR_ProgressView.Designer.vb">
-      <DependentUpon>BOORGSOR_ProgressView.vb</DependentUpon>
-    </Compile>
-    <Compile Include="BOORGSOR_ProgressView.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="BOORGSOR.VB">
+    <Compile Include="BHVEBOLL.VB" />
+    <Compile Include="BFVEBOLL.vb" />
+    <Compile Include="BOVEBOLL.VB">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -168,7 +158,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="THIRD-PARTY-NOTICES.md" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
@@ -181,7 +170,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx" />
-    <EmbeddedResource Include="Resources\ImportaImpegni24.png" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

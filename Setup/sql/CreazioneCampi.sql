@@ -16,9 +16,10 @@ CHECK (
 GO
 
 
--- 3. Il codice deve essere univoco SOLO all'interno dello stesso dd_conto
-CREATE UNIQUE INDEX UX_DESTDIV_dd_conto_dd_hhCodDestExc
+-- 3. Il codice deve essere univoco SOLO all'interno della stessa ditta e dello stesso dd_conto
+CREATE UNIQUE INDEX UX_DESTDIV_codditt_dd_conto_dd_hhCodDestExc
 ON dbo.DESTDIV (
+    codditt,
     dd_conto,
     dd_hhCodDestExc
 )

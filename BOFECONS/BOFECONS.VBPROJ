@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,18 +9,14 @@
     <StartupObject>
     </StartupObject>
     <RootNamespace>NTSInformatica</RootNamespace>
-    <AssemblyName>BO__CLIE</AssemblyName>
+    <AssemblyName>BOFECONS</AssemblyName>
     <MyType>Windows</MyType>
     <OptionStrict>On</OptionStrict>
-    <ProjectGuid>{41A4A78C-A323-4946-8B6A-0DF9362A1F5F}</ProjectGuid>
-    <SccProjectName>
-    </SccProjectName>
-    <SccLocalPath>
-    </SccLocalPath>
-    <SccAuxPath>
-    </SccAuxPath>
-    <SccProvider>
-    </SccProvider>
+    <ProjectGuid>{5D19FDD3-53F3-4ECD-83C4-0F9A5F9C517A}</ProjectGuid>
+    <SccProjectName></SccProjectName>
+    <SccLocalPath></SccLocalPath>
+    <SccAuxPath></SccAuxPath>
+    <SccProvider></SccProvider>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -46,71 +42,72 @@
     <NoWarn>42016,41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42353,42354,42355</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BN__CLIE, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="BN__STD, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="BNSBCLIE, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="DevExpress.XtraBars.v14.2, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-      <HintPath>..\TEST\DevExpress.XtraBars.v14.2.dll</HintPath>
-    </Reference>
-    <Reference Include="DevExpress.XtraGrid.v14.2, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-      <HintPath>..\TEST\DevExpress.XtraGrid.v14.2.dll</HintPath>
-    </Reference>
-    <Reference Include="BNXXLIST, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="BNXXPROV, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="BNXXSCON, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="BNXXSOCI, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.XtraEditors.v14.2, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-      <HintPath>..\TEST\DevExpress.XtraEditors.v14.2.dll</HintPath>
-    </Reference>
-    <Reference Include="BNCBACQD, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="BNLBMENU, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Utils.v14.2, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-      <HintPath>..\TEST\DevExpress.Utils.v14.2.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Drawing" />
-    <Reference Include="DevExpress.Data.v14.2, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-      <HintPath>..\TEST\DevExpress.Data.v14.2.dll</HintPath>
-    </Reference>
+    <Reference Include="BNFECONS, Culture=neutral, processorArchitecture=MSIL">
+ <SpecificVersion>False</SpecificVersion>
+ <Private>False</Private>
+</Reference>
+<Reference Include="System"/>
+<Reference Include="BN__STD, Culture=neutral, processorArchitecture=MSIL">
+ <SpecificVersion>False</SpecificVersion>
+ <Private>False</Private>
+</Reference>
+<Reference Include="System.Data"/>
+<Reference Include="System.Drawing"/>
+<Reference Include="BNFESYNC, Culture=neutral, processorArchitecture=MSIL">
+ <SpecificVersion>False</SpecificVersion>
+ <Private>False</Private>
+</Reference>
+<Reference Include="BN__CLIE, Culture=neutral, processorArchitecture=MSIL">
+ <SpecificVersion>False</SpecificVersion>
+ <Private>False</Private>
+</Reference>
+<Reference Include="BN__SEND, Culture=neutral, processorArchitecture=MSIL">
+ <SpecificVersion>False</SpecificVersion>
+ <Private>False</Private>
+</Reference>
+<Reference Include="BNFEIMPE, Culture=neutral, processorArchitecture=MSIL">
+ <SpecificVersion>False</SpecificVersion>
+ <Private>False</Private>
+</Reference>
+<Reference Include="System.Management"/>
+<Reference Include="System.Xml"/>
+<Reference Include="BNLBMENU, Culture=neutral, processorArchitecture=MSIL">
+ <SpecificVersion>False</SpecificVersion>
+ <Private>False</Private>
+</Reference>
+<Reference Include="BouncyCastle.Crypto, Culture=neutral, processorArchitecture=MSIL">
+ <SpecificVersion>False</SpecificVersion>
+ <Private>False</Private>
+ <HintPath>..\TEST\BouncyCastle.Crypto.dll</HintPath>
+</Reference>
+<Reference Include="System.Web.Services"/>
+<Reference Include="System.Windows.Forms"/>
+<Reference Include="DevExpress.XtraBars.v14.2, Culture=neutral, processorArchitecture=MSIL">
+ <SpecificVersion>False</SpecificVersion>
+ <Private>False</Private>
+ <HintPath>..\TEST\DevExpress.XtraBars.v14.2.dll</HintPath>
+</Reference>
+<Reference Include="DevExpress.XtraGrid.v14.2, Culture=neutral, processorArchitecture=MSIL">
+ <SpecificVersion>False</SpecificVersion>
+ <Private>False</Private>
+ <HintPath>..\TEST\DevExpress.XtraGrid.v14.2.dll</HintPath>
+</Reference>
+<Reference Include="DevExpress.Utils.v14.2, Culture=neutral, processorArchitecture=MSIL">
+ <SpecificVersion>False</SpecificVersion>
+ <Private>False</Private>
+ <HintPath>..\TEST\DevExpress.Utils.v14.2.dll</HintPath>
+</Reference>
+<Reference Include="DevExpress.XtraEditors.v14.2, Culture=neutral, processorArchitecture=MSIL">
+ <SpecificVersion>False</SpecificVersion>
+ <Private>False</Private>
+ <HintPath>..\TEST\DevExpress.XtraEditors.v14.2.dll</HintPath>
+</Reference>
+<Reference Include="DevExpress.Data.v14.2, Culture=neutral, processorArchitecture=MSIL">
+ <SpecificVersion>False</SpecificVersion>
+ <Private>False</Private>
+ <HintPath>..\TEST\DevExpress.Data.v14.2.dll</HintPath>
+</Reference>
+
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
@@ -123,12 +120,9 @@
     <Import Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BH__CLIE.VB" />
-    <Compile Include="BF__CLIE.vb" />
-    <Compile Include="BO__CLIE.VB">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="BO__DESG.vb">
+    <Compile Include="BHFECONS.VB" />
+    <Compile Include="BFFECONS.vb" />
+    <Compile Include="BOFECONS.VB">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="My Project\AssemblyInfo.vb" />
