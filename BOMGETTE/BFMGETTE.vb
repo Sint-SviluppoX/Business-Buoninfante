@@ -147,7 +147,12 @@ Public Class CLFMGETTE
                 strPath = System.IO.Path.Combine(oApp.ServerDir, "Images", "QR")
             End If
 
-            'Una cartella distinta evita interferenze tra stampe contemporanee.
+            If Not System.IO.Directory.Exists(strPath) Then
+                System.IO.Directory.CreateDirectory(strPath)
+            End If
+            If Not SvuotaCartelleQR(strPath) Then Return String.Empty
+
+            'Crea la cartella di appoggio della stampa corrente.
             Dim strCartellaSessione As String = System.IO.Path.Combine(
                 strPath,
                 DateTime.Now.ToString("yyyyMMdd_HHmmss_fff") & "_" & Guid.NewGuid().ToString("N"))
@@ -166,6 +171,18 @@ Public Class CLFMGETTE
         Catch ex As Exception
             CLN__STD.GestErr(ex, Me, "")
             Return String.Empty
+        End Try
+    End Function
+
+    Private Function SvuotaCartelleQR(ByVal strPath As String) As Boolean
+        Try
+            For Each strDirectory As String In System.IO.Directory.GetDirectories(strPath)
+                System.IO.Directory.Delete(strDirectory, True)
+            Next
+            Return True
+        Catch ex As Exception
+            CLN__STD.GestErr(ex, Me, "")
+            Return False
         End Try
     End Function
 
