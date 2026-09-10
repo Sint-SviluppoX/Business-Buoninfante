@@ -19,7 +19,7 @@ Public Class CLFMGETTE
 
     Public Overridable Function InserisciEtichetteDBExt(ByVal strTipoDoc As String, ByVal nAnnoDoc As Integer, ByVal strSerieDoc As String, ByVal lNumDoc As Integer, ByVal nRigaDoc As Integer, ByVal DataDoc As Date, ByVal CodArt As String, ByVal DesArt As String, ByVal Qta As Double, ByVal nEticInCorso As Integer) As Boolean
         Try
-            ThrowRemoteEvent(New NTSEventArgs("LABEL", oApp.Tr(Me, 129030099509236239, "Preparazione etichetta RFID n° |" & nEticInCorso & "| in corso...")))
+            ThrowRemoteEvent(New NTSEventArgs("LABEL", oApp.Tr(Me, 129030099509236239, "Preparazione etichetta RFID nÂ° |" & nEticInCorso & "| in corso...")))
             Return oClhEtte.InserisciEtichetteDBExt(strTipoDoc, nAnnoDoc, strSerieDoc, lNumDoc, nRigaDoc, DataDoc, CodArt, DesArt, Qta)
         Catch ex As Exception
             '-------------------------------------------------
@@ -100,7 +100,7 @@ Public Class CLFMGETTE
                                          lIIstMats, bUsaTtstMatr, lNumEtiche, nBD_Listino, bModTCO, strTaglia, lIIstMatrTmp,
                                          bStampaNegativi, dttOut, dttTmp, dttTmp2, bDocMagazz, bDaDoc, strCode, strCodartList,
                                          strCodart, bAvvisare, nEtichetteAggPerTC, bUsaNumetiDaListaSel, bPrzNetClasseSconto, bUsaNumetiDaListaSel_DaNote) Then Return False
-            '*** Controllo se è la stampa che mi interessa ***
+            '*** Controllo se Ã¨ la stampa che mi interessa ***
             If bMoltdiv Then Return True
 
             strSQL = $"SELECT * FROM TTSTMATR WHERE instid = {CStrSQL(lIIstMatr)}"
@@ -135,4 +135,70 @@ Public Class CLFMGETTE
             '---------------------------------------------------------
         End Try
     End Function
+
+#Region "Generazione QR etichette"
+
+    Public Overridable Function CreaQR(ByVal dttQR As DataTable,
+                                       Optional ByVal strPath As String = "") As String
+        Try
+            If dttQR Is Nothing OrElse dttQR.Rows.Count = 0 Then Return String.Empty
+
+            If String.IsNullOrWhiteSpace(strPath) Then
+                strPath = System.IO.Path.Combine(oApp.ServerDir, "Images", "QR")
+            End If
+
+            'Una cartella distinta evita interferenze tra stampe contemporanee.
+            Dim strCartellaSessione As String = System.IO.Path.Combine(
+                strPath,
+                DateTime.Now.ToString("yyyyMMdd_HHmmss_fff") & "_" & Guid.NewGuid().ToString("N"))
+            System.IO.Directory.CreateDirectory(strCartellaSessione)
+
+            Dim oEncoder As New MessagingToolkit.QRCode.Codec.QRCodeEncoder
+            For Each dtrQR As DataRow In dttQR.Rows
+                Using img As Bitmap = New Bitmap(oEncoder.Encode(NTSCStr(dtrQR!xx_qr)))
+                    img.Save(System.IO.Path.Combine(strCartellaSessione,
+                                                    NTSCStr(dtrQR!xx_FileName)),
+                             Imaging.ImageFormat.Png)
+                End Using
+            Next
+
+            Return strCartellaSessione & System.IO.Path.DirectorySeparatorChar
+        Catch ex As Exception
+            CLN__STD.GestErr(ex, Me, "")
+            Return String.Empty
+        End Try
+    End Function
+
+    Public Overridable Function OttieniDatiPerQR(ByVal lInstId As Integer) As DataTable
+        Try
+            Dim dttQR As DataTable = oClhEtte.OttieniDatiPerQR(strDittaCorrente, lInstId)
+            If dttQR Is Nothing Then Return Nothing
+
+            dttQR.Columns.Add("xx_qr", GetType(String))
+            dttQR.Columns.Add("xx_FileName", GetType(String))
+
+            For Each dtrQR As DataRow In dttQR.Rows
+                dtrQR!xx_qr = "|JF" & NTSCStr(dtrQR!tt_hhweek) &
+                    NTSCStr(dtrQR!tt_anno).Substring(2, 2) &
+                    NTSCStr(dtrQR!tt_hhprogr).PadLeft(4, "0"c) &
+                    "|" & NTSCStr(dtrQR!xx_codarfo).Trim() &
+                    "|" & NTSCStr(dtrQR!xx_code).Trim() &
+                    "|" & NTSCStr(dtrQR!xx_hhulrif).Trim() &
+                    "|" & Right("00" & NTSCStr(dtrQR!tt_hhweek), 2) &
+                    NTSCStr(dtrQR!tt_anno) & "|"
+
+                dtrQR!xx_FileName = NTSCStr(dtrQR!tt_tipork) & "_" &
+                    NTSCStr(dtrQR!tt_anno) & "_" & NTSCStr(dtrQR!tt_serie).Trim() & "_" &
+                    NTSCStr(dtrQR!tt_numdoc) & "_" & NTSCStr(dtrQR!tt_riga) & ".png"
+            Next
+
+            Return dttQR
+        Catch ex As Exception
+            CLN__STD.GestErr(ex, Me, "")
+            Return Nothing
+        End Try
+    End Function
+
+#End Region
+
 End Class

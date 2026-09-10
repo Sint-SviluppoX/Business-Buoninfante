@@ -37,6 +37,7 @@ Public Class FROMGETTE
     Dim strCode As String = ""
     Dim strCodartList As String = ""
     Dim strCodart As String = ""
+    Dim strPathQR As String = ""
     Dim bAvvisare As Boolean = True
     Dim dttOut As New DataTable
     Dim dttTmp As New DataTable
@@ -102,7 +103,7 @@ SaltaRichiestaDiStampa:
       '--- Se:
       '--- Origine dati = "Lista selezionata articoli"
       '--- E' indicata una taglia
-      '--- Il CheckBox "Tutte le taglie gestite dall'articolo" NON è selezionato
+      '--- Il CheckBox "Tutte le taglie gestite dall'articolo" NON Ã¨ selezionato
       '--- elimina, dal DataTable di ritorno "dttOut" tutti gli articoli che non appartengono alla taglia indicata.
       '--- Se, alla fine non esistono dati, avvisa ed esce
       '---------------------------------------------------------------------------------------------------------
@@ -132,7 +133,7 @@ SaltaRichiestaDiStampa:
           dttTmp = Nothing
           If Not oCleEtte.SelectBarcode(ckBarcode.Checked, cbSolobar.SelectedValue, NTSCStr(dttOut.Rows(i)!Codart), dttTmp) Then Return
 
-          'se è stata selezionata la ckDatamod, non stampo le etichette con data ultima modifica >= della data indicata in edDatamod (WSS 326842)
+          'se Ã¨ stata selezionata la ckDatamod, non stampo le etichette con data ultima modifica >= della data indicata in edDatamod (WSS 326842)
           If ckDatamod.Checked Then
             For l As Integer = (dttTmp.Rows.Count - 1) To 0 Step -1
               If NTSCDate(dttTmp.Rows(l)!bc_datagg) < NTSCDate(edDatamod.Text) Then dttTmp.Rows(l).Delete()
@@ -157,7 +158,7 @@ SaltaRichiestaDiStampa:
                 frmEtba.InitEntity(oCleEtte)
                 frmEtba.strCodart = NTSCStr(dttOut.Rows(i)!Codart)
                 '----------------------------------------------------
-                'WSS 327276: la FRMMGETBA mi farà vedere in 'lbArticolo' di quale articolo sono i codici a barre che voglio stampare
+                'WSS 327276: la FRMMGETBA mi farÃ  vedere in 'lbArticolo' di quale articolo sono i codici a barre che voglio stampare
                 frmEtba.lbArticolo.Text = "Articolo: " & NTSCStr(dttOut.Rows(i)!Codart) & " - " & NTSCStr(dttOut.Rows(i)!Descr)
                 '----------------------------------------------------
                 frmEtba.ShowDialog(Me)
@@ -206,7 +207,7 @@ SaltaRichiestaDiStampa:
             If dttTmpRfid.Rows.Count > 0 Then
               TmpDesArt = String.Empty
               TmpQtaEtic = 0
-              'Ciclo le righe e cancello e inserisco riga in DB esterno con info articolo, info documento e quantità
+              'Ciclo le righe e cancello e inserisco riga in DB esterno con info articolo, info documento e quantitÃ 
               For iEticDB As Integer = 0 To dttTmpRfid.Rows.Count - 1
                 'Lancio una delete per cancellare eventuale riga creata in precedenza con le stesse chiavi
                 oClfEtte.CancellaEtichetteDBExt(dttTmpRfid.Rows(iEticDB)("tipork").ToString, NTSCInt(dttTmpRfid.Rows(iEticDB)("anno").ToString), dttTmpRfid.Rows(iEticDB)("serie").ToString, NTSCInt(dttTmpRfid.Rows(iEticDB)("numero").ToString), NTSCInt(dttTmpRfid.Rows(iEticDB)("riga").ToString))
@@ -222,11 +223,11 @@ SaltaRichiestaDiStampa:
                   'oClfEtte.InserisciEtichetteDBExt(dttTmpRfid.Rows(iEticDB)("tipork").ToString, NTSCInt(dttTmpRfid.Rows(iEticDB)("anno").ToString), dttTmpRfid.Rows(iEticDB)("serie").ToString, NTSCInt(dttTmpRfid.Rows(iEticDB)("numero").ToString), NTSCInt(dttTmpRfid.Rows(iEticDB)("riga").ToString), NTSCDate(dttTmpRfid.Rows(iEticDB)("dtdoc").ToString), dttTmpRfid.Rows(iEticDB)("codart").ToString, TmpDesArt, CDbl(dttTmpRfid.Rows(iEticDB)("quant").ToString), TmpQtaEtic)
                 End If
               Next
-              oApp.MsgBoxInfo("Operazione completata!" & Chr(13) & "Inviate N° " & TmpQtaEtic & " etichette RFID!" & Chr(13) & IIf(NRecordDelete > 0, "Cancellate N° " & NRecordDelete & " righe di etichette RFID!", String.Empty).ToString, True)
+              oApp.MsgBoxInfo("Operazione completata!" & Chr(13) & "Inviate NÂ° " & TmpQtaEtic & " etichette RFID!" & Chr(13) & IIf(NRecordDelete > 0, "Cancellate NÂ° " & NRecordDelete & " righe di etichette RFID!", String.Empty).ToString, True)
             End If
             'Se non ho messo "solo RFID" continuo con il resto (standard)
             If cb_hhstamparifd.SelectedValue = "RFI" Then
-              oApp.MsgBoxInfo("Operazione completata!" & Chr(13) & "Inviate N° " & TmpQtaEtic & " etichette RFID!" & Chr(13) & IIf(NRecordDelete > 0, "Cancellate N° " & NRecordDelete & " righe di etichette RFID!", String.Empty).ToString)
+              oApp.MsgBoxInfo("Operazione completata!" & Chr(13) & "Inviate NÂ° " & TmpQtaEtic & " etichette RFID!" & Chr(13) & IIf(NRecordDelete > 0, "Cancellate NÂ° " & NRecordDelete & " righe di etichette RFID!", String.Empty).ToString)
               Return
             End If
           End If
@@ -246,10 +247,14 @@ SaltaRichiestaDiStampa:
                                      lIIstMatrTmp, bStampaNegativi, dttOut, dttTmp, dttTmp2, bDocMagazz,
                                      bDaDoc, strCode, strCodartList, strCodart, bAvvisare, nNEtichettePerTC, ckNumeti.Checked, ckPrzNetClasseSconto.Checked,
                                      opNumetiDaNote.Checked) Then Return
+
+      'Genera i PNG richiesti dal report QR usando i dati appena preparati.
+      Dim dttQR As DataTable = oClfEtte.OttieniDatiPerQR(lIIstMatr)
+      strPathQR = oClfEtte.CreaQR(dttQR)
       '------------------------------------------------------------------------------------------------------------
       '--- Se chiamato da voce di menu/strumenti "Stampa etichette finale" in 
       '--- Gestione Documenti di Magazzino (BNVEBOLL) o Gestione Ordini/Impegni/Preventivi (BNORGSOR)
-      '--- richiama una griglia, raggruppata per articolo, dove si possono modificare le quantità da stampare
+      '--- richiama una griglia, raggruppata per articolo, dove si possono modificare le quantitÃ  da stampare
       '------------------------------------------------------------------------------------------------------------
       If ModificaNumeroEtichetteDaStampare() = False Then Return
       '------------------------------------------------------------------------------------------------------------
@@ -282,7 +287,7 @@ SaltaRichiestaDiStampa:
          NTSCStr(cbOrigine.SelectedValue) = "M" Then strTipodoc = NTSCStr(cbTipodoc.SelectedValue)
       nPjob = oMenu.ReportPEInit(oApp.Ditta, Me, "BSMGETTE", strKey, strTipodoc, 0, nDestin, strNomRpt, False, "Stampa etichette", False)
       '-----------------------------------------------------------------------------------------
-      '--- Se la stampa è stata annullata esce
+      '--- Se la stampa Ã¨ stata annullata esce
       '-----------------------------------------------------------------------------------------
       If nPjob Is Nothing Then Return
       '-----------------------------------------------------------------------------------------
@@ -298,9 +303,13 @@ SaltaRichiestaDiStampa:
                     " And {ttstmats.instid} = " & lIIstMats
       End If
       '------------------------------------------------------------------------------------------------------------
-      'lancio tutti gli eventuali reports (gestisce già il multireport)
+      'lancio tutti gli eventuali reports (gestisce giÃ  il multireport)
       For i = 1 To UBound(CType(nPjob, Array), 2)
         If i = 1 Then
+          If strPathQR <> "" Then
+            nRis = oMenu.PESetFormula(NTSCInt(CType(nPjob, Array).GetValue(0, i)),
+                                      "QRFolderPath", "'" & strPathQR & "'")
+          End If
           nRis = oMenu.PESetFormula(NTSCInt(CType(nPjob, Array).GetValue(0, i)), "STAMPAPREZZI", "'" & NTSCStr(IIf(ckPrezzi.Checked, "S", "N")) & "'")
           If ckPrezzi.Checked Then
             nRis = oMenu.PESetFormula(NTSCInt(CType(nPjob, Array).GetValue(0, i)), "DATAVAL", "'" & edValida.Text & "'")
@@ -453,7 +462,7 @@ SaltaRichiestaDiStampa:
   '    '--- Se:
   '    '--- Origine dati = "Lista selezionata articoli"
   '    '--- E' indicata una taglia
-  '    '--- Il CheckBox "Tutte le taglie gestite dall'articolo" NON è selezionato
+  '    '--- Il CheckBox "Tutte le taglie gestite dall'articolo" NON Ã¨ selezionato
   '    '--- elimina, dal DataTable di ritorno "dttOut" tutti gli articoli che non appartengono alla taglia indicata.
   '    '--- Se, alla fine non esistono dati, avvisa ed esce
   '    '---------------------------------------------------------------------------------------------------------
@@ -537,7 +546,7 @@ SaltaRichiestaDiStampa:
   '          If dttTmpRfid.Rows.Count > 0 Then
   '            TmpDesArt = String.Empty
   '            TmpQtaEtic = 0
-  '            'Ciclo le righe e cancello e inserisco riga in DB esterno con info articolo, info documento e quantità
+  '            'Ciclo le righe e cancello e inserisco riga in DB esterno con info articolo, info documento e quantitÃ 
   '            For iEticDB As Integer = 0 To dttTmpRfid.Rows.Count - 1
   '              'Lancio una delete per cancellare eventuale riga creata in precedenza con le stesse chiavi
   '              oClfEtte.CancellaEtichetteDBExt(dttTmpRfid.Rows(iEticDB)("tipork").ToString, NTSCInt(dttTmpRfid.Rows(iEticDB)("anno").ToString), dttTmpRfid.Rows(iEticDB)("serie").ToString, NTSCInt(dttTmpRfid.Rows(iEticDB)("numero").ToString), NTSCInt(dttTmpRfid.Rows(iEticDB)("riga").ToString))
@@ -553,11 +562,11 @@ SaltaRichiestaDiStampa:
   '                'oClfEtte.InserisciEtichetteDBExt(dttTmpRfid.Rows(iEticDB)("tipork").ToString, NTSCInt(dttTmpRfid.Rows(iEticDB)("anno").ToString), dttTmpRfid.Rows(iEticDB)("serie").ToString, NTSCInt(dttTmpRfid.Rows(iEticDB)("numero").ToString), NTSCInt(dttTmpRfid.Rows(iEticDB)("riga").ToString), NTSCDate(dttTmpRfid.Rows(iEticDB)("dtdoc").ToString), dttTmpRfid.Rows(iEticDB)("codart").ToString, TmpDesArt, CDbl(dttTmpRfid.Rows(iEticDB)("quant").ToString), TmpQtaEtic)
   '              End If
   '            Next
-  '            oApp.MsgBoxInfo("Operazione completata!" & Chr(13) & "Inviate N° " & TmpQtaEtic & " etichette RFID!" & Chr(13) & IIf(NRecordDelete > 0, "Cancellate N° " & NRecordDelete & " righe di etichette RFID!", String.Empty).ToString, True)
+  '            oApp.MsgBoxInfo("Operazione completata!" & Chr(13) & "Inviate NÂ° " & TmpQtaEtic & " etichette RFID!" & Chr(13) & IIf(NRecordDelete > 0, "Cancellate NÂ° " & NRecordDelete & " righe di etichette RFID!", String.Empty).ToString, True)
   '          End If
   '          'Se non ho messo "solo RFID" continuo con il resto (standard)
   '          If cb_hhstamparifd.SelectedValue = "RFI" Then
-  '            oApp.MsgBoxInfo("Operazione completata!" & Chr(13) & "Inviate N° " & TmpQtaEtic & " etichette RFID!" & Chr(13) & IIf(NRecordDelete > 0, "Cancellate N° " & NRecordDelete & " righe di etichette RFID!", String.Empty).ToString)
+  '            oApp.MsgBoxInfo("Operazione completata!" & Chr(13) & "Inviate NÂ° " & TmpQtaEtic & " etichette RFID!" & Chr(13) & IIf(NRecordDelete > 0, "Cancellate NÂ° " & NRecordDelete & " righe di etichette RFID!", String.Empty).ToString)
   '            Return
   '          End If
   '        End If
@@ -598,7 +607,7 @@ SaltaRichiestaDiStampa:
   '    '-----------------------------------------------------------------------------------------
   '    nPjob = oMenu.ReportPEInit(oApp.Ditta, Me, "BSMGETTE", strKey, " ", 0, nDestin, strNomRpt, False, "Stampa etichette", False)
   '    '-----------------------------------------------------------------------------------------
-  '    '--- Se la stampa è stata annullata esce
+  '    '--- Se la stampa Ã¨ stata annullata esce
   '    '-----------------------------------------------------------------------------------------
   '    If nPjob Is Nothing Then Return
   '    '-----------------------------------------------------------------------------------------
@@ -615,7 +624,7 @@ SaltaRichiestaDiStampa:
   '    End If
 
   '    '--------------------------------------------------
-  '    'lancio tutti gli eventuali reports (gestisce già il multireport)
+  '    'lancio tutti gli eventuali reports (gestisce giÃ  il multireport)
   '    For i = 1 To UBound(CType(nPjob, Array), 2)
   '      If i = 1 Then
   '        nRis = oMenu.PESetFormula(NTSCInt(CType(nPjob, Array).GetValue(0, i)), "STAMPAPREZZI", "'" & NTSCStr(IIf(ckPrezzi.Checked, "S", "N")) & "'")

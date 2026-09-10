@@ -66,7 +66,7 @@ Public Class CLHMGETTE
             StrSql += "," & CStrSQL(DesArt)
             StrSql += "," & CDblSQL(Qta)
             'Info da inserire nel campo "TagRfid_Etichetta"
-            'EAN13 (13 caratteri) + Anno Doc (yy) (2 caratteri) + N. doc (00000) (5 caratteri) + Serie doc (1 carattere) + N∞ riga doc (3 caratteri)
+            'EAN13 (13 caratteri) + Anno Doc (yy) (2 caratteri) + N. doc (00000) (5 caratteri) + Serie doc (1 carattere) + N¬∞ riga doc (3 caratteri)
             '-----------------------------------------------
             StrRfid = IIf(CodArt.Length > 13, CodArt.Substring(0, 13), CodArt).ToString
             StrRfid += DataDoc.ToString("yy")
@@ -75,7 +75,7 @@ Public Class CLHMGETTE
             StrRfid += nRigaDoc.ToString("000")
             '-----------------------------------------------
             StrSql += "," & CStrSQL(StrRfid)
-            'Converto la mia stringa di 24 numeri in esadecimale per passarli al DB che li passer‡ all'RFID (08-06-21)
+            'Converto la mia stringa di 24 numeri in esadecimale per passarli al DB che li passer√† all'RFID (08-06-21)
             StrRfidHEX = IntegerToHex(StrRfid)
             StrSql += "," & CStrSQL(StrRfidHEX)
             StrSql += ");"
@@ -286,6 +286,38 @@ Public Class CLHMGETTE
             '--------------------------------------------------------------
         End Try
     End Function
+#End Region
+
+#Region "Dati QR etichette"
+
+    Public Overridable Function OttieniDatiPerQR(ByVal strDitta As String,
+                                                  ByVal lInstId As Integer) As DataTable
+        Try
+            Dim strSQL As String =
+                "SELECT tt_hhweek, tt_anno, tt_hhprogr," &
+                " caf_codarfo AS xx_codarfo, tt_numdoc, tt_riga, tt_serie, tt_tipork," &
+                " td_hhulrif AS xx_hhulrif, bc_code AS xx_code" &
+                " FROM TTSTMATR" &
+                " LEFT JOIN MOVORD ON TTSTMATR.codditt = MOVORD.codditt" &
+                " AND tt_tipork = mo_tipork AND tt_anno = mo_anno" &
+                " AND tt_serie = mo_serie AND tt_numdoc = mo_numord AND tt_riga = mo_riga" &
+                " LEFT JOIN TESTORD ON TTSTMATR.codditt = TESTORD.codditt" &
+                " AND tt_tipork = td_tipork AND tt_anno = td_anno" &
+                " AND tt_serie = td_serie AND tt_numdoc = td_numord" &
+                " LEFT JOIN CODARFO ON TTSTMATR.codditt = CODARFO.codditt" &
+                " AND tt_codart = caf_codart AND tt_conto = caf_conto" &
+                " LEFT JOIN BARCODE ON TTSTMATR.codditt = BARCODE.codditt" &
+                " AND tt_codart = bc_codart" &
+                " WHERE TTSTMATR.codditt = " & CStrSQL(strDitta) &
+                " AND instid = " & lInstId.ToString()
+
+            Return OpenRecordset(strSQL, CLE__APP.DBTIPO.DBAZI, "TTSTMATR").Tables("TTSTMATR")
+        Catch ex As Exception
+            CLN__STD.GestErr(ex, Me, "")
+            Return Nothing
+        End Try
+    End Function
+
 #End Region
 
 End Class
