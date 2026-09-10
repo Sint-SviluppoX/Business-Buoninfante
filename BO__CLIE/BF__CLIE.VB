@@ -22,6 +22,8 @@ Public Class CLF__CLIE
 
   Public Overrides Function DesgTestPreSalva() As Boolean
     Try
+      NormalizzaCampiDestinazione()
+
       If Not MyBase.DesgTestPreSalva() Then Return False
 
       Dim righe() As DataRow = dttDestdivEx.Select(
@@ -55,6 +57,30 @@ Public Class CLF__CLIE
       Return False
     End Try
   End Function
+
+  Private Sub NormalizzaCampiDestinazione()
+    Try
+      Dim righe() As DataRow = dttDestdivEx.Select(
+        Nothing, Nothing, DataViewRowState.Added Or DataViewRowState.ModifiedCurrent)
+
+      For Each riga As DataRow In righe
+        If Not riga.IsNull("dd_hhCodDestExc") AndAlso
+           NTSCInt(riga!dd_hhCodDestExc) <= 0 Then
+          riga!dd_hhCodDestExc = DBNull.Value
+        End If
+
+        If Not riga.IsNull("dd_hhGiornoConsegna") Then
+          Dim giorno As String = NTSCStr(riga!dd_hhGiornoConsegna).Trim()
+          If giorno = "" OrElse giorno = "0" Then
+            riga!dd_hhGiornoConsegna = DBNull.Value
+          End If
+        End If
+      Next
+    Catch ex As Exception
+      CLN__STD.GestErr(ex, Me, "")
+      Throw
+    End Try
+  End Sub
 
   Private Function TrovaDuplicatoLocale(ByVal corrente As DataRow,
                                         ByVal codiceEsterno As Integer) As DataRow
