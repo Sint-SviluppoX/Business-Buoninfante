@@ -59,6 +59,9 @@ riscriverli, salvo richiesta esplicita.
   regola confermata e ipotesi.
 - Preservare le modifiche locali già presenti e limitare ogni intervento ai file
   necessari per la richiesta.
+- Conservare i nomi canonici delle cartelle comuni: `Buscube`, `TEST`, `sql`,
+  `tests` e `Distribuzione`. Non spostare i file operativi nella repository:
+  usare la cartella `Asc\SINTESI` dichiarata sopra.
 
 ## Verifica
 
