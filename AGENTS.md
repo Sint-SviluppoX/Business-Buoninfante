@@ -10,6 +10,7 @@ Questa repository contiene la personalizzazione Business CUBE Buoninfante.
 - Configurazione concordata: `Debug|Any CPU`.
 - Avviatore locale: progetto `BUSCUBE`.
 - Installazione Bus collegata: `\\servertest\Bus\Buoninfante`.
+- Cartella file operativi: `\\servertest\Bus\Buoninfante\Asc\SINTESI`.
 - Tipo ambiente dell'installazione Bus: non confermato.
 - Skill da utilizzare per attività Business: `business-cube`.
 
@@ -49,6 +50,10 @@ riscriverli, salvo richiesta esplicita.
   Usare `\\servertest\Bus\Buoninfante` per verificare runtime, `Script`,
   `Dllmap.ini`, `Asc` e `Agg`; considerarla di sola consultazione salvo richiesta
   esplicita dell'utente.
+- Creare e utilizzare i file operativi in
+  `\\servertest\Bus\Buoninfante\Asc\SINTESI`. Se `SINTESI` manca, crearla; se
+  non è consentita la scrittura, chiedere l'autorizzazione all'utente e non
+  ripiegare silenziosamente su un'altra directory.
 - Fuori dagli esempi ufficiali `BO__CLIE` e `BOORGSOR`, non assumere che il codice
   esistente sia uno standard approvato: distinguere sempre codice osservato,
   regola confermata e ipotesi.
