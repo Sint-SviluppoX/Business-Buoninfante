@@ -62,6 +62,11 @@ riscriverli, salvo richiesta esplicita.
 - Conservare i nomi canonici delle cartelle comuni: `Buscube`, `TEST`, `sql`,
   `tests` e `Distribuzione`. Non spostare i file operativi nella repository:
   usare la cartella `Asc\SINTESI` dichiarata sopra.
+- Nei push includere sorgenti, progetti, `sql`, `tests`, automazioni e artefatti
+  custom di `Distribuzione`. Escludere il contenuto di `TEST`, output temporanei,
+  runtime standard, credenziali e file operativi. Versione assembly e binari
+  distribuibili vanno committati insieme quando appartengono alla stessa
+  release tecnica.
 
 ## Verifica
 

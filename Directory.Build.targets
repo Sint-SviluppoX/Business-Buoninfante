@@ -1,0 +1,19 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <HhDistribuzioneDir>$(MSBuildThisFileDirectory)Distribuzione\</HhDistribuzioneDir>
+  </PropertyGroup>
+
+  <!-- Mantiene aggiornati gli artefatti versionati dopo la compilazione di ogni DLL custom. -->
+  <Target Name="HhAggiornaDistribuzione"
+          AfterTargets="Build"
+          Condition="'$(OutputType)' == 'Library'">
+    <MakeDir Directories="$(HhDistribuzioneDir)" />
+    <Copy SourceFiles="$(TargetPath)"
+          DestinationFolder="$(HhDistribuzioneDir)"
+          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(TargetDir)$(TargetName).pdb"
+          DestinationFolder="$(HhDistribuzioneDir)"
+          SkipUnchangedFiles="true"
+          Condition="Exists('$(TargetDir)$(TargetName).pdb')" />
+  </Target>
+</Project>
