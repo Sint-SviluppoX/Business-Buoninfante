@@ -6,72 +6,96 @@ Public Class FRO__DESG
 
 #Region "Controlli importazione impegni"
 
-  Private fm_hhImpExc As NTSGroupBox
-  Private lb_hhCodDestExc As NTSLabel
-  Private WithEvents ed_hhCodDestExc As NTSTextBoxNum
-  Private lb_hhGiornoConsegna As NTSLabel
-  Private WithEvents cb_hhGiornoConsegna As NTSComboBox
+    Public WithEvents fm_hhImpExc As NTSGroupBox
+    Public WithEvents lb_hhCodDestExc As NTSLabel
+    Public WithEvents ed_hhCodDestExc As NTSTextBoxNum
+    Public WithEvents lb_hhGiornoConsegna As NTSLabel
+    Public WithEvents cb_hhGiornoConsegna As NTSComboBox
 
-  Public Overrides Sub InitializeComponent()
-    Try
-      MyBase.InitializeComponent()
+    Public Overrides Sub InitializeComponent()
+        Try
+            MyBase.InitializeComponent()
 
-            fm_hhImpExc = New NTSGroupBox With {
-        .Name = "fm_hhImpExc",
-        .Text = "IMPORT EXCEL",
-        .Left = 4,
-        .Top = 516,
-        .Width = 456,
-        .Height = 120,
-        .Tile = True
-      }
-
-            lb_hhCodDestExc = CreaEtichetta("lb_hhCodDestExc", "Codice destinazione excel", 4, 28, 132)
-            ed_hhCodDestExc = New NTSTextBoxNum With {
-        .Name = "ed_hhCodDestExc",
-        .Left = 144,
-        .Top = 28,
-        .Width = 40
-      }
-
-            lb_hhGiornoConsegna = CreaEtichetta("lb_hhGiornoConsegna", "Giorno consegna", 4, 56, 88)
-            cb_hhGiornoConsegna = New NTSComboBox With {
-        .Name = "cb_hhGiornoConsegna",
-        .Left = 100,
-        .Top = 56,
-        .Width = 100
-      }
-
-            fm_hhImpExc.Controls.AddRange(New Control() {
-        lb_hhCodDestExc, ed_hhCodDestExc, lb_hhGiornoConsegna, cb_hhGiornoConsegna
-      })
-
-            'L'editor NTS registra il gruppo nella pagina "Altri dati".
-            flAltriDati.Controls.Add(fm_hhImpExc)
+            Me.fm_hhImpExc = New NTSInformatica.NTSGroupBox()
+            Me.lb_hhCodDestExc = New NTSInformatica.NTSLabel()
+            Me.ed_hhCodDestExc = New NTSInformatica.NTSTextBoxNum()
+            Me.lb_hhGiornoConsegna = New NTSInformatica.NTSLabel()
+            Me.cb_hhGiornoConsegna = New NTSInformatica.NTSComboBox()
+            CType(Me.fm_hhImpExc, System.ComponentModel.ISupportInitialize).BeginInit()
+            Me.fm_hhImpExc.SuspendLayout()
+            CType(Me.ed_hhCodDestExc.Properties, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.cb_hhGiornoConsegna.Properties, System.ComponentModel.ISupportInitialize).BeginInit()
+            Me.flAltriDati.SuspendLayout()
+            Me.SuspendLayout()
+            '
+            'fm_hhImpExc
+            '
+            Me.fm_hhImpExc.AllowDrop = True
+            Me.fm_hhImpExc.Appearance.BackColor = System.Drawing.Color.Transparent
+            Me.fm_hhImpExc.Appearance.Options.UseBackColor = True
+            Me.fm_hhImpExc.Controls.Add(Me.lb_hhCodDestExc)
+            Me.fm_hhImpExc.Controls.Add(Me.ed_hhCodDestExc)
+            Me.fm_hhImpExc.Controls.Add(Me.lb_hhGiornoConsegna)
+            Me.fm_hhImpExc.Controls.Add(Me.cb_hhGiornoConsegna)
+            Me.fm_hhImpExc.Location = New System.Drawing.Point(4, 516)
+            Me.fm_hhImpExc.Margin = New System.Windows.Forms.Padding(4)
+            Me.fm_hhImpExc.Name = "fm_hhImpExc"
+            Me.fm_hhImpExc.Size = New System.Drawing.Size(456, 120)
+            Me.fm_hhImpExc.Text = "IMPORT EXCEL"
+            Me.fm_hhImpExc.Tile = True
+            Me.fm_hhImpExc.TileIndex = 5
+            '
+            'lb_hhCodDestExc
+            '
+            Me.lb_hhCodDestExc.BackColor = System.Drawing.Color.Transparent
+            Me.lb_hhCodDestExc.Location = New System.Drawing.Point(4, 28)
+            Me.lb_hhCodDestExc.Name = "lb_hhCodDestExc"
+            Me.lb_hhCodDestExc.NTSBordeStyle = NTSInformatica.NTSLabel.NTSBorderStyle.FieldCaption
+            Me.lb_hhCodDestExc.Size = New System.Drawing.Size(132, 20)
+            Me.lb_hhCodDestExc.Text = "Codice destinazione excel"
+            Me.lb_hhCodDestExc.UseMnemonic = False
+            '
+            'ed_hhCodDestExc
+            '
+            Me.ed_hhCodDestExc.Location = New System.Drawing.Point(144, 28)
+            Me.ed_hhCodDestExc.Name = "ed_hhCodDestExc"
+            Me.ed_hhCodDestExc.Properties.AutoHeight = False
+            Me.ed_hhCodDestExc.Size = New System.Drawing.Size(40, 20)
+            '
+            'lb_hhGiornoConsegna
+            '
+            Me.lb_hhGiornoConsegna.BackColor = System.Drawing.Color.Transparent
+            Me.lb_hhGiornoConsegna.Location = New System.Drawing.Point(4, 56)
+            Me.lb_hhGiornoConsegna.Name = "lb_hhGiornoConsegna"
+            Me.lb_hhGiornoConsegna.NTSBordeStyle = NTSInformatica.NTSLabel.NTSBorderStyle.FieldCaption
+            Me.lb_hhGiornoConsegna.Size = New System.Drawing.Size(88, 20)
+            Me.lb_hhGiornoConsegna.Text = "Giorno consegna"
+            Me.lb_hhGiornoConsegna.UseMnemonic = False
+            '
+            'cb_hhGiornoConsegna
+            '
+            Me.cb_hhGiornoConsegna.Location = New System.Drawing.Point(100, 56)
+            Me.cb_hhGiornoConsegna.Name = "cb_hhGiornoConsegna"
+            Me.cb_hhGiornoConsegna.Properties.AutoHeight = False
+            Me.cb_hhGiornoConsegna.Properties.Buttons.AddRange(New DevExpress.XtraEditors.Controls.EditorButton() {
+        New DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)})
+            Me.cb_hhGiornoConsegna.Properties.DropDownRows = 8
+            Me.cb_hhGiornoConsegna.Properties.TextEditStyle = DevExpress.XtraEditors.Controls.TextEditStyles.DisableTextEditor
+            Me.cb_hhGiornoConsegna.Size = New System.Drawing.Size(100, 20)
+            '
+            'FRO__DESG
+            '
+            Me.flAltriDati.Controls.Add(Me.fm_hhImpExc)
+            CType(Me.fm_hhImpExc, System.ComponentModel.ISupportInitialize).EndInit()
+            Me.fm_hhImpExc.ResumeLayout(False)
+            CType(Me.ed_hhCodDestExc.Properties, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.cb_hhGiornoConsegna.Properties, System.ComponentModel.ISupportInitialize).EndInit()
+            Me.flAltriDati.ResumeLayout(False)
+            Me.ResumeLayout(False)
         Catch ex As Exception
             CLN__STD.GestErr(ex, Me, "")
-    End Try
-  End Sub
-
-  Private Function CreaEtichetta(ByVal nome As String, ByVal testo As String,
-                                 ByVal x As Integer, ByVal y As Integer,
-                                 ByVal larghezza As Integer) As NTSLabel
-    Try
-      Return New NTSLabel With {
-        .Name = nome,
-        .Text = testo,
-        .Left = x,
-        .Top = y,
-        .Width = larghezza,
-        .Height = 20,
-        .NTSBordeStyle = NTSLabel.NTSBorderStyle.FieldCaption,
-        .UseMnemonic = False
-      }
-    Catch ex As Exception
-      CLN__STD.GestErr(ex, Me, "")
-      Return New NTSLabel()
-    End Try
-  End Function
+        End Try
+    End Sub
 
     Public Overrides Sub InitControls()
         Try
@@ -107,24 +131,6 @@ Public Class FRO__DESG
             ed_hhCodDestExc.NTSDbField = "DESTDIV.dd_hhCodDestExc"
             cb_hhGiornoConsegna.NTSDbField = "DESTDIV.dd_hhGiornoConsegna"
             NTSFormAddDataBinding(dcDesg, fm_hhImpExc)
-        Catch ex As Exception
-            CLN__STD.GestErr(ex, Me, "")
-        End Try
-    End Sub
-
-    Protected Overrides Sub OnShown(ByVal e As EventArgs)
-        Try
-            MyBase.OnShown(e)
-
-            flAltriDati.SuspendLayout()
-
-            flAltriDati.Controls.SetChildIndex(
-              fm_hhImpExc,
-              flAltriDati.Controls.Count - 1
-            )
-
-            flAltriDati.ResumeLayout(True)
-
         Catch ex As Exception
             CLN__STD.GestErr(ex, Me, "")
         End Try

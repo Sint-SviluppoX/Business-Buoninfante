@@ -29,10 +29,18 @@ Public Class FROORGSOR
   Public Overrides Sub InitializeComponent()
     MyBase.InitializeComponent()
     Me.tlb_hhImportaImpegni = New NTSInformatica.NTSBarButtonItem()
-    Me.NtsBarManager1.Items.Add(Me.tlb_hhImportaImpegni)
-    Me.tlbMain.LinksPersistInfo.Add(New DevExpress.XtraBars.LinkPersistInfo(Me.tlb_hhImportaImpegni))
-    Me.tlb_hhImportaImpegni.Glyph = GetGlyphImportaImpegni()
+    Me.NtsBarManager1.Items.AddRange(New DevExpress.XtraBars.BarItem() {Me.tlb_hhImportaImpegni})
+    Me.NtsBarManager1.MaxItemId = 214
+    Me.tlbMain.LinksPersistInfo.AddRange(New DevExpress.XtraBars.LinkPersistInfo() {
+      New DevExpress.XtraBars.LinkPersistInfo(Me.tlb_hhImportaImpegni)})
+    '
+    'tlb_hhImportaImpegni
+    '
     Me.tlb_hhImportaImpegni.Caption = "Importa impegni"
+    Me.tlb_hhImportaImpegni.Glyph = GetGlyphImportaImpegni()
+    Me.tlb_hhImportaImpegni.Id = 213
+    Me.tlb_hhImportaImpegni.Name = "tlb_hhImportaImpegni"
+    Me.tlb_hhImportaImpegni.PaintStyle = DevExpress.XtraBars.BarItemPaintStyle.CaptionInMenu
     Me.tlb_hhImportaImpegni.Visible = False
   End Sub
   Public Overrides Sub InitControls()
@@ -104,24 +112,6 @@ Public Class FROORGSOR
       CLN__STD.GestErr(ex, Me, "")
     End Try
   End Sub
-  Private Sub AggiornaPulsanteImporta()
-    Try
-      If tlb_hhImportaImpegni Is Nothing Then Return
-
-      Dim strTipoDoc As String = ""
-      If oCleGsor IsNot Nothing AndAlso oCleGsor.dttET IsNot Nothing AndAlso
-         oCleGsor.dttET.Rows.Count > 0 Then
-        strTipoDoc = NTSCStr(oCleGsor.dttET.Rows(0)!et_tipork)
-      ElseIf cbTipoDoc IsNot Nothing Then
-        strTipoDoc = NTSCStr(cbTipoDoc.SelectedValue)
-      End If
-
-      Me.tlb_hhImportaImpegni.Visible = String.Equals(strTipoDoc.Trim(), "R",
-                                                       StringComparison.OrdinalIgnoreCase)
-    Catch ex As Exception
-      CLN__STD.GestErr(ex, Me, "")
-    End Try
-  End Sub
   Public Overridable Sub tlb_hhImportaImpegni_ItemClick(ByVal sender As Object,
     ByVal e As DevExpress.XtraBars.ItemClickEventArgs) Handles tlb_hhImportaImpegni.ItemClick
     Dim frmProgress As BOORGSOR_ProgressView = Nothing
@@ -151,6 +141,29 @@ Public Class FROORGSOR
       End Try
 
       MostraEsitoImportazione(esito)
+    Catch ex As Exception
+      CLN__STD.GestErr(ex, Me, "")
+    End Try
+  End Sub
+
+#End Region
+
+#Region "Utils"
+
+  Private Sub AggiornaPulsanteImporta()
+    Try
+      If tlb_hhImportaImpegni Is Nothing Then Return
+
+      Dim strTipoDoc As String = ""
+      If oCleGsor IsNot Nothing AndAlso oCleGsor.dttET IsNot Nothing AndAlso
+         oCleGsor.dttET.Rows.Count > 0 Then
+        strTipoDoc = NTSCStr(oCleGsor.dttET.Rows(0)!et_tipork)
+      ElseIf cbTipoDoc IsNot Nothing Then
+        strTipoDoc = NTSCStr(cbTipoDoc.SelectedValue)
+      End If
+
+      Me.tlb_hhImportaImpegni.Visible = String.Equals(strTipoDoc.Trim(), "R",
+                                                       StringComparison.OrdinalIgnoreCase)
     Catch ex As Exception
       CLN__STD.GestErr(ex, Me, "")
     End Try

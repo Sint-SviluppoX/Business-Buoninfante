@@ -27,6 +27,12 @@ criticità note o riuso di pattern:
 
 `C:\Users\Utente\source\Assistente_Sviluppo\Business\reports\BUONINFANTE-SR8-CU4-ANALISI.md`
 
+`BO__CLIE` e `BOORGSOR` sono gli esempi ufficiali per le convenzioni adottate
+nelle personalizzazioni di questa repository. Sono gli unici progetti custom da
+usare come riferimenti affidabili e collaudabili. Gli altri progetti custom sono
+sorgenti storici non scritti dall'autore corrente: non usarli come standard e non
+riscriverli, salvo richiesta esplicita.
+
 ## Regole operative
 
 - Le richieste esplicite dell'utente prevalgono sulle indicazioni generali della
@@ -37,8 +43,9 @@ criticità note o riuso di pattern:
 - Prima di modificare form secondarie, verificare il mapping effettivo in
   `Dllmap.ini` e gli eventuali XML esportati dall'editor NTS.
 - Non inventare identificativi `oApp.Tr`.
-- Non assumere che il codice esistente sia uno standard approvato: distinguere
-  sempre codice osservato, regola confermata e ipotesi.
+- Fuori dagli esempi ufficiali `BO__CLIE` e `BOORGSOR`, non assumere che il codice
+  esistente sia uno standard approvato: distinguere sempre codice osservato,
+  regola confermata e ipotesi.
 - Preservare le modifiche locali già presenti e limitare ogni intervento ai file
   necessari per la richiesta.
 

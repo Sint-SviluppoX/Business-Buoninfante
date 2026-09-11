@@ -24,9 +24,9 @@ Public Class CLFORGSOR
     End Try
   End Function
 
-  Public Overrides Function AfterColUpdate_CORPO_ec_quant(sender As Object, e As DataColumnChangeEventArgs) As Boolean
-    Try
-      Dim Tmp As Boolean = MyBase.AfterColUpdate_CORPO_ec_quant(sender, e)
+    Public Overrides Function AfterColUpdate_CORPO_ec_quant(sender As Object, e As DataColumnChangeEventArgs) As Boolean
+        Try
+            Dim Tmp As Boolean = MyBase.AfterColUpdate_CORPO_ec_quant(sender, e)
             'Calcolo il volume (Pers. Alfy 24-03-21)
             'If Not IsNothing(dttArti) Then e.Row!ec_hhvol = NTSCDec(e.ProposedValue) * NTSCDec(dttArti.Rows(0)!ar_volume)
             'Calcolo peso netto e lordo (Pers. Alfy 15-03-22)

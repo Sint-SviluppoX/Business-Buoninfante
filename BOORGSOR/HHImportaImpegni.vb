@@ -30,9 +30,12 @@ Friend Class HH_ImportatoreImpegni
   Public Event Avanzamento(ByVal messaggio As String, ByVal percentuale As Integer)
 
   Private ReadOnly _oApp As CLE__APP
-  Private ReadOnly _oMenu As CLE__MENU
+    Private ReadOnly _oMenu As CLE__MENU
     Private ReadOnly _oClfGsor As CLFORGSOR
     Private ReadOnly _clienti As Dictionary(Of String, Integer)
+    Private _oCleGsor As CLEORGSOR
+    Private _ultimoMessaggioEntity As String = ""
+    Private _ultimoErrore As String = ""
 
     Public Sub New(ByVal oApp As CLE__APP, ByVal oMenu As CLE__MENU,
                  ByVal oClfGsor As CLFORGSOR)
@@ -58,6 +61,12 @@ Friend Class HH_ImportatoreImpegni
             MostraAvanzamento("Lettura del file Excel...", 0)
             Dim documenti As List(Of HH_DocumentoImpegnoImport) = LeggiERaggruppa(percorsoFile)
             MostraAvanzamento("File letto: " & documenti.Count.ToString() & " impegni da elaborare.", 5)
+
+            'La stessa BEORGSOR viene inizializzata una volta e riutilizzata in sequenza.
+            If Not InizializzaEntityOrdini() Then
+                esito.ErroriDocumento.Add("Inizializzazione: " & _ultimoErrore)
+                Return esito
+            End If
 
             For indiceDocumento As Integer = 0 To documenti.Count - 1
                 Dim documento As HH_DocumentoImpegnoImport = documenti(indiceDocumento)
@@ -98,22 +107,16 @@ Friend Class HH_ImportatoreImpegni
             Dim dataConsegna As Nullable(Of Date) = Nothing
             RisolviDestinazione(conto, documento.CodDest, codDest, dataConsegna, noteNonBloccanti)
 
-            Dim ordine As New HH_CreatoreImpegno(_oApp, _oMenu)
-            If Not ordine.Inizializza() Then
-                motivo = ordine.UltimoErrore
+            If Not NuovoImpegno(conto, documento.Riferimento, codDest, dataConsegna) Then
+                motivo = _ultimoErrore
                 Return False
             End If
 
-            If Not ordine.Nuovo(conto, documento.Riferimento, codDest, dataConsegna) Then
-                motivo = ordine.UltimoErrore
-                Return False
-            End If
-
-            AggiungiAvvisoEntity(ordine, noteNonBloccanti)
+            AggiungiAvvisoEntity(noteNonBloccanti)
             For indiceRiga As Integer = 0 To documento.Righe.Count - 1
                 Dim riga As HH_RigaImpegnoImport = documento.Righe(indiceRiga)
-                If Not InserisciRiga(ordine, riga, noteNonBloccanti) Then
-                    motivo = ordine.UltimoErrore
+                If Not InserisciRiga(riga, noteNonBloccanti) Then
+                    motivo = _ultimoErrore
                     Return False
                 End If
                 MostraAvanzamento("Impegno " & indiceDocumento.ToString() & " di " &
@@ -123,18 +126,18 @@ Friend Class HH_ImportatoreImpegni
                                 indiceRiga + 1, documento.Righe.Count))
             Next
 
-            If Not ordine.HaRigheValide() Then
+            If Not HaRigheValide() Then
                 motivo = "documento privo di righe valide: salvataggio annullato"
                 Return False
             End If
 
-            ordine.AggiungiNote(noteNonBloccanti)
+            AggiungiNote(noteNonBloccanti)
             MostraAvanzamento("Impegno " & indiceDocumento.ToString() & " di " &
         totaleDocumenti.ToString() & " (" & documento.Riferimento & "): salvataggio...",
         PercentualeDocumento(indiceDocumento, totaleDocumenti,
                                 documento.Righe.Count, documento.Righe.Count))
-            If Not ordine.Salva() Then
-                motivo = ordine.UltimoErrore
+            If Not SalvaImpegno() Then
+                motivo = _ultimoErrore
                 Return False
             End If
 
@@ -145,6 +148,10 @@ Friend Class HH_ImportatoreImpegni
             Return False
         End Try
     End Function
+
+#End Region
+
+#Region "Utils"
 
     Private Sub RisolviDestinazione(ByVal conto As Integer,
                                   ByVal codDestEsterno As Integer,
@@ -229,9 +236,8 @@ Friend Class HH_ImportatoreImpegni
         End Try
     End Sub
 
-    Private Function InserisciRiga(ByVal ordine As HH_CreatoreImpegno,
-                                 ByVal riga As HH_RigaImpegnoImport,
-                                 ByVal noteNonBloccanti As List(Of String)) As Boolean
+    Private Function InserisciRiga(ByVal riga As HH_RigaImpegnoImport,
+                                  ByVal noteNonBloccanti As List(Of String)) As Boolean
         Try
             'Le righe testuali vengono riportate nelle note senza creare righe articolo.
             If String.Equals(riga.TipoRiga, "T", StringComparison.OrdinalIgnoreCase) Then
@@ -241,20 +247,20 @@ Friend Class HH_ImportatoreImpegni
                 Return True
             Else
                 Dim codiceOriginale As String = riga.Codart
-                If Not ordine.AggiungiRiga(codiceOriginale, riga.Quantita, "") Then
-                    Dim erroreCodart As String = ordine.UltimoErrore
+                If Not AggiungiRiga(codiceOriginale, riga.Quantita, "") Then
+                    Dim erroreCodart As String = _ultimoErrore
                     noteNonBloccanti.Add(codiceOriginale &
                                " - Quantità: " & NTSCStr(riga.Quantita) &
                                " - " & erroreCodart)
                     Return True
                 End If
-                AggiungiAvvisoEntity(ordine, noteNonBloccanti)
+                AggiungiAvvisoEntity(noteNonBloccanti)
             End If
 
-            If Not ordine.SalvaRigaCorrente() Then
-                noteNonBloccanti.Add(ordine.UltimoErrore)
+            If Not SalvaRigaCorrente() Then
+                noteNonBloccanti.Add(_ultimoErrore)
             Else
-                AggiungiAvvisoEntity(ordine, noteNonBloccanti)
+                AggiungiAvvisoEntity(noteNonBloccanti)
             End If
 
             Return True
@@ -279,10 +285,9 @@ Friend Class HH_ImportatoreImpegni
         End Try
     End Function
 
-    Private Sub AggiungiAvvisoEntity(ByVal ordine As HH_CreatoreImpegno,
-                                   ByVal noteNonBloccanti As List(Of String))
+    Private Sub AggiungiAvvisoEntity(ByVal noteNonBloccanti As List(Of String))
         Try
-            Dim avviso As String = ordine.ConsumaAvvisoEntity()
+            Dim avviso As String = ConsumaAvvisoEntity()
             If Not String.IsNullOrWhiteSpace(avviso) Then noteNonBloccanti.Add(avviso)
         Catch ex As Exception
             CLN__STD.GestErr(ex, Me, "")
@@ -398,58 +403,38 @@ Friend Class HH_ImportatoreImpegni
 
 #End Region
 
-End Class
-
-'Wrapper isolato della BEORGSOR usata per creare e salvare un impegno.
-Friend Class HH_CreatoreImpegno
-
-    Private ReadOnly _oApp As CLE__APP
-    Private ReadOnly _oMenu As CLE__MENU
-    Private _oCleGsor As CLEORGSOR
-    Private _ultimoMessaggioEntity As String = ""
-
-    Public Property UltimoErrore As String = ""
-
-    Public Sub New(ByVal oApp As CLE__APP, ByVal oMenu As CLE__MENU)
-        Try
-            _oApp = oApp
-            _oMenu = oMenu
-        Catch ex As Exception
-            CLN__STD.GestErr(ex, Me, "")
-        End Try
-    End Sub
-
 #Region "Creazione impegno"
 
-    Public Function Inizializza() As Boolean
+    Private Function InizializzaEntityOrdini() As Boolean
         Try
+            PulisciErrore()
             Dim strErr As String = ""
             Dim oTmp As Object = Nothing
             If Not CLN__STD.NTSIstanziaDll(_oApp.ServerDir, _oApp.NetDir, "BNORGSOR", "BEORGSOR",
                                     oTmp, strErr, False, "", "") Then
-                UltimoErrore = "inizializzazione BEORGSOR non riuscita: " & strErr
+                _ultimoErrore = "inizializzazione BEORGSOR non riuscita: " & strErr
                 Return False
             End If
 
             _oCleGsor = CType(oTmp, CLEORGSOR)
             AddHandler _oCleGsor.RemoteEvent, AddressOf GestisciEventoEntity
             If Not _oCleGsor.Init(_oApp, Nothing, _oMenu.oCleComm, "", False, "", "") Then
-                UltimoErrore = "inizializzazione ordine non riuscita"
+                _ultimoErrore = "inizializzazione ordine non riuscita"
                 Return False
             End If
             If Not _oCleGsor.InitExt() Then
-                UltimoErrore = "inizializzazione estesa ordine non riuscita"
+                _ultimoErrore = "inizializzazione estesa ordine non riuscita"
                 Return False
             End If
             Return True
         Catch ex As Exception
             CLN__STD.GestErr(ex, Me, "")
-            UltimoErrore = ex.Message
+            _ultimoErrore = ex.Message
             Return False
         End Try
     End Function
 
-    Public Function Nuovo(ByVal conto As Integer, ByVal riferimento As String,
+    Private Function NuovoImpegno(ByVal conto As Integer, ByVal riferimento As String,
                           ByVal codDest As Integer,
                           ByVal dataConsegna As Nullable(Of Date)) As Boolean
         Try
@@ -459,19 +444,19 @@ Friend Class HH_CreatoreImpegno
             Dim anno As Integer = Now.Year
             Dim numero As Integer = _oCleGsor.LegNuma(tipork, serie, anno)
             If numero = 0 Then
-                UltimoErrore = "numerazione impegni R non disponibile"
+                _ultimoErrore = "numerazione impegni R non disponibile"
                 Return False
             End If
 
             ImpostaFlagCreazione()
             If Not _oCleGsor.ApriOrdine(_oApp.Ditta, True, tipork, anno, serie, numero,
                                   _oCleGsor.dsShared) Then
-                UltimoErrore = MotivoEntity("apertura preventiva impegno non riuscita")
+                _ultimoErrore = MotivoEntity("apertura preventiva impegno non riuscita")
                 Return False
             End If
             If _oCleGsor.dsShared.Tables.Contains("TESTA") AndAlso
          _oCleGsor.dsShared.Tables("TESTA").Rows.Count > 0 Then
-                UltimoErrore = "il numero assegnato risulta già esistente"
+                _ultimoErrore = "il numero assegnato risulta già esistente"
                 Return False
             End If
 
@@ -483,7 +468,7 @@ Friend Class HH_CreatoreImpegno
             _oCleGsor.bInNuovoDocSilent = True
 
             If _oCleGsor.dttET Is Nothing OrElse _oCleGsor.dttET.Rows.Count = 0 Then
-                UltimoErrore = MotivoEntity("testata impegno non inizializzata")
+                _ultimoErrore = MotivoEntity("testata impegno non inizializzata")
                 Return False
             End If
 
@@ -499,12 +484,12 @@ Friend Class HH_CreatoreImpegno
             Return True
         Catch ex As Exception
             CLN__STD.GestErr(ex, Me, "")
-            UltimoErrore = ex.Message
+            _ultimoErrore = ex.Message
             Return False
         End Try
     End Function
 
-    Public Function AggiungiRiga(ByVal codart As String, ByVal quantita As Decimal,
+    Private Function AggiungiRiga(ByVal codart As String, ByVal quantita As Decimal,
                                ByVal descrizione As String) As Boolean
         Try
             PulisciErrore()
@@ -513,7 +498,7 @@ Friend Class HH_CreatoreImpegno
 
             Dim numeroRiga As Integer = GetUltimoNumeroRiga() + 1
             If Not _oCleGsor.AggiungiRigaCorpo(False, codart, 0, numeroRiga) Then
-                UltimoErrore = MotivoEntity("articolo non riconosciuto: " & codart)
+                _ultimoErrore = MotivoEntity("articolo non riconosciuto: " & codart)
                 RimuoviRigheAggiunte(numeroRigheIniziale)
                 Return False
             End If
@@ -522,7 +507,7 @@ Friend Class HH_CreatoreImpegno
             If _oCleGsor.dttEC Is Nothing OrElse
          _oCleGsor.dttEC.Rows.Count <= numeroRigheIniziale OrElse
          String.IsNullOrWhiteSpace(NTSCStr(_oCleGsor.dttEC.Rows(_oCleGsor.dttEC.Rows.Count - 1)!ec_codart)) Then
-                UltimoErrore = MotivoEntity("articolo non riconosciuto: " & codart)
+                _ultimoErrore = MotivoEntity("articolo non riconosciuto: " & codart)
                 RimuoviRigheAggiunte(numeroRigheIniziale)
                 Return False
             End If
@@ -533,31 +518,31 @@ Friend Class HH_CreatoreImpegno
             Return True
         Catch ex As Exception
             CLN__STD.GestErr(ex, Me, "")
-            UltimoErrore = ex.Message
+            _ultimoErrore = ex.Message
             Return False
         End Try
     End Function
 
-    Public Function SalvaRigaCorrente() As Boolean
+    Private Function SalvaRigaCorrente() As Boolean
         Try
             PulisciErrore()
             If _oCleGsor.dttEC Is Nothing OrElse _oCleGsor.dttEC.Rows.Count = 0 Then
-                UltimoErrore = "nessuna riga corpo disponibile"
+                _ultimoErrore = "nessuna riga corpo disponibile"
                 Return False
             End If
             If Not _oCleGsor.RecordSalva(_oCleGsor.dttEC.Rows.Count - 1, False, Nothing) Then
-                UltimoErrore = MotivoEntity("salvataggio riga non riuscito")
+                _ultimoErrore = MotivoEntity("salvataggio riga non riuscito")
                 Return False
             End If
             Return True
         Catch ex As Exception
             CLN__STD.GestErr(ex, Me, "")
-            UltimoErrore = ex.Message
+            _ultimoErrore = ex.Message
             Return False
         End Try
     End Function
 
-    Public Function HaRigheValide() As Boolean
+    Private Function HaRigheValide() As Boolean
         Try
             If _oCleGsor Is Nothing OrElse _oCleGsor.dttEC Is Nothing OrElse
                Not _oCleGsor.dttEC.Columns.Contains("ec_codart") Then Return False
@@ -573,7 +558,7 @@ Friend Class HH_CreatoreImpegno
         End Try
     End Function
 
-    Public Sub AggiungiNote(ByVal note As List(Of String))
+    Private Sub AggiungiNote(ByVal note As List(Of String))
         Try
             If note Is Nothing OrElse note.Count = 0 Then Return
             Dim testoEsistente As String = NTSCStr(_oCleGsor.dttET.Rows(0)!et_note).Trim()
@@ -586,27 +571,27 @@ Friend Class HH_CreatoreImpegno
         End Try
     End Sub
 
-    Public Function Salva() As Boolean
+    Private Function SalvaImpegno() As Boolean
         Try
             PulisciErrore()
             If Not _oCleGsor.OkTestata() Then
-                UltimoErrore = MotivoEntity("controlli testata non superati")
+                _ultimoErrore = MotivoEntity("controlli testata non superati")
                 Return False
             End If
             _oCleGsor.CalcolaTotali()
             If Not _oCleGsor.SalvaOrdine("N") Then
-                UltimoErrore = MotivoEntity("salvataggio impegno non riuscito")
+                _ultimoErrore = MotivoEntity("salvataggio impegno non riuscito")
                 Return False
             End If
             Return True
         Catch ex As Exception
             CLN__STD.GestErr(ex, Me, "")
-            UltimoErrore = ex.Message
+            _ultimoErrore = ex.Message
             Return False
         End Try
     End Function
 
-    Public Function ConsumaAvvisoEntity() As String
+    Private Function ConsumaAvvisoEntity() As String
         Try
             Dim messaggio As String = _ultimoMessaggioEntity
             _ultimoMessaggioEntity = ""
@@ -619,7 +604,7 @@ Friend Class HH_CreatoreImpegno
 
 #End Region
 
-#Region "Supporto BEORGSOR"
+#Region "Utils_ORGSOR"
 
     Private Sub RimuoviRigheAggiunte(ByVal numeroRigheIniziale As Integer)
         Try
@@ -654,33 +639,33 @@ Friend Class HH_CreatoreImpegno
     End Function
 
     Private Sub GestisciEventoEntity(ByVal sender As Object, ByRef e As NTSEventArgs)
-    Try
-      If e IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(e.Message) Then
-        _ultimoMessaggioEntity = e.Message.Replace(vbCr, " ").Replace(vbLf, " ").Trim()
-      End If
+        Try
+            If e IsNot Nothing AndAlso Not String.IsNullOrWhiteSpace(e.Message) Then
+                _ultimoMessaggioEntity = e.Message.Replace(vbCr, " ").Replace(vbLf, " ").Trim()
+            End If
+        Catch ex As Exception
+            CLN__STD.GestErr(ex, Me, "")
+        End Try
+    End Sub
+
+    Private Sub PulisciErrore()
+        Try
+            _ultimoErrore = ""
+            _ultimoMessaggioEntity = ""
     Catch ex As Exception
       CLN__STD.GestErr(ex, Me, "")
     End Try
   End Sub
 
-  Private Sub PulisciErrore()
-    Try
-      UltimoErrore = ""
-      _ultimoMessaggioEntity = ""
-    Catch ex As Exception
-      CLN__STD.GestErr(ex, Me, "")
-    End Try
-  End Sub
-
-  Private Function MotivoEntity(ByVal fallback As String) As String
-    Try
-      If Not String.IsNullOrWhiteSpace(_ultimoMessaggioEntity) Then Return _ultimoMessaggioEntity
-      Return fallback
-    Catch ex As Exception
-      CLN__STD.GestErr(ex, Me, "")
-      Return fallback
-    End Try
-  End Function
+    Private Function MotivoEntity(ByVal fallback As String) As String
+        Try
+            If Not String.IsNullOrWhiteSpace(_ultimoMessaggioEntity) Then Return _ultimoMessaggioEntity
+            Return fallback
+        Catch ex As Exception
+            CLN__STD.GestErr(ex, Me, "")
+            Return fallback
+        End Try
+    End Function
 
 #End Region
 
