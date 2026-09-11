@@ -9,6 +9,8 @@ Questa repository contiene la personalizzazione Business CUBE Buoninfante.
 - Ambiente: Visual Studio 2019, .NET Framework 4.8.
 - Configurazione concordata: `Debug|Any CPU`.
 - Avviatore locale: progetto `BUSCUBE`.
+- Installazione Bus collegata: `\\servertest\Bus\Buoninfante`.
+- Tipo ambiente dell'installazione Bus: non confermato.
 - Skill da utilizzare per attività Business: `business-cube`.
 
 ## Riferimenti autorevoli
@@ -43,6 +45,10 @@ riscriverli, salvo richiesta esplicita.
 - Prima di modificare form secondarie, verificare il mapping effettivo in
   `Dllmap.ini` e gli eventuali XML esportati dall'editor NTS.
 - Non inventare identificativi `oApp.Tr`.
+- Non confondere la cartella locale `TEST` con l'installazione Bus esterna.
+  Usare `\\servertest\Bus\Buoninfante` per verificare runtime, `Script`,
+  `Dllmap.ini`, `Asc` e `Agg`; considerarla di sola consultazione salvo richiesta
+  esplicita dell'utente.
 - Fuori dagli esempi ufficiali `BO__CLIE` e `BOORGSOR`, non assumere che il codice
   esistente sia uno standard approvato: distinguere sempre codice osservato,
   regola confermata e ipotesi.
