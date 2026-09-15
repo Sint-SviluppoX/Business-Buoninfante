@@ -2,34 +2,36 @@ Imports System.Data
 Imports System.IO
 Imports ExcelDataReader
 Imports NTSInformatica.CLN__STD
+Imports System.Globalization
 
 'Dati minimi estratti da una riga del file Excel.
 Friend Class HH_RigaImpegnoImport
-  Public Property TipoRiga As String
-  Public Property Codart As String
-  Public Property Descrizione As String
-  Public Property Quantita As Decimal
+    Public Property TipoRiga As String
+    Public Property Codart As String
+    Public Property Descrizione As String
+    Public Property Quantita As Decimal
 End Class
 
 'Raggruppamento preventivo delle righe appartenenti allo stesso impegno.
 Friend Class HH_DocumentoImpegnoImport
-  Public Property Riferimento As String
-  Public Property Cliente As String
-  Public Property CodDest As Integer
-  Public ReadOnly Property Righe As New List(Of HH_RigaImpegnoImport)
+    Public Property Riferimento As String
+    Public Property Cliente As String
+    Public Property CodDest As Integer
+    Public Property DataBaseConsegna As Date
+    Public ReadOnly Property Righe As New List(Of HH_RigaImpegnoImport)
 End Class
 
 'Esito sintetico mostrato al termine dell'importazione.
 Friend Class HH_EsitoImportazioneImpegni
-  Public Property DocumentiSalvati As Integer
-  Public ReadOnly Property ErroriDocumento As New List(Of String)
+    Public Property DocumentiSalvati As Integer
+    Public ReadOnly Property ErroriDocumento As New List(Of String)
 End Class
 
 Friend Class HH_ImportatoreImpegni
 
-  Public Event Avanzamento(ByVal messaggio As String, ByVal percentuale As Integer)
+    Public Event Avanzamento(ByVal messaggio As String, ByVal percentuale As Integer)
 
-  Private ReadOnly _oApp As CLE__APP
+    Private ReadOnly _oApp As CLE__APP
     Private ReadOnly _oMenu As CLE__MENU
     Private ReadOnly _oClfGsor As CLFORGSOR
     Private ReadOnly _clienti As Dictionary(Of String, Integer)
@@ -105,7 +107,8 @@ Friend Class HH_ImportatoreImpegni
             Dim noteNonBloccanti As New List(Of String)
             Dim codDest As Integer = documento.CodDest
             Dim dataConsegna As Nullable(Of Date) = Nothing
-            RisolviDestinazione(conto, documento.CodDest, codDest, dataConsegna, noteNonBloccanti)
+            RisolviDestinazione(conto, documento.CodDest, documento.DataBaseConsegna,
+                                codDest, dataConsegna, noteNonBloccanti)
 
             If Not NuovoImpegno(conto, documento.Riferimento, codDest, dataConsegna) Then
                 motivo = _ultimoErrore
@@ -155,6 +158,7 @@ Friend Class HH_ImportatoreImpegni
 
     Private Sub RisolviDestinazione(ByVal conto As Integer,
                                   ByVal codDestEsterno As Integer,
+                                  ByVal dataBase As Date,
                                   ByRef codDest As Integer,
                                   ByRef dataConsegna As Nullable(Of Date),
                                   ByVal noteNonBloccanti As List(Of String))
@@ -171,7 +175,7 @@ Friend Class HH_ImportatoreImpegni
             Dim giornoConsegna As String = NTSCStr(risultato.Rows(0)!dd_hhGiornoConsegna).Trim()
             If String.IsNullOrWhiteSpace(giornoConsegna) Then Return
 
-            dataConsegna = CalcolaProssimaDataConsegna(giornoConsegna)
+            dataConsegna = CalcolaProssimaDataConsegna(giornoConsegna, dataBase)
             If Not dataConsegna.HasValue Then
                 noteNonBloccanti.Add("Giorno consegna non riconosciuto per destinazione " &
                             codDestEsterno.ToString() & ": " & giornoConsegna)
@@ -185,7 +189,8 @@ Friend Class HH_ImportatoreImpegni
         End Try
     End Sub
 
-    Private Function CalcolaProssimaDataConsegna(ByVal giorno As String) As Nullable(Of Date)
+    Private Function CalcolaProssimaDataConsegna(ByVal giorno As String,
+                                                ByVal dataBase As Date) As Nullable(Of Date)
         Try
             Dim valore As String = NTSCStr(giorno).Trim().ToLowerInvariant().Replace("ì", "i")
             If valore.Length >= 3 Then valore = valore.Substring(0, 3)
@@ -203,9 +208,9 @@ Friend Class HH_ImportatoreImpegni
             End Select
 
             Dim giorniDaAggiungere As Integer =
-        (CInt(giornoSettimana) - CInt(Date.Today.DayOfWeek) + 7) Mod 7
+        (CInt(giornoSettimana) - CInt(dataBase.DayOfWeek) + 7) Mod 7
             If giorniDaAggiungere = 0 Then giorniDaAggiungere = 7
-            Return Date.Today.AddDays(giorniDaAggiungere)
+            Return dataBase.Date.AddDays(giorniDaAggiungere)
         Catch ex As Exception
             CLN__STD.GestErr(ex, Me, "")
             Return Nothing
@@ -313,7 +318,8 @@ Friend Class HH_ImportatoreImpegni
                     documento = New HH_DocumentoImpegnoImport() With {
             .Riferimento = riferimento,
             .Cliente = ValoreTesto(rigaExcel, 0).Trim(),                  'Colonna A
-            .CodDest = NTSCInt(ValoreTesto(rigaExcel, 5))                'Colonna F
+            .CodDest = NTSCInt(ValoreTesto(rigaExcel, 5)),               'Colonna F
+            .DataBaseConsegna = LeggiDataBaseConsegna(rigaExcel(7), riferimento) 'Colonna H
           }
                     perRiferimento.Add(riferimento, documento)
                     documenti.Add(documento)
@@ -388,6 +394,19 @@ Friend Class HH_ImportatoreImpegni
             Throw
         End Try
         Return risultato
+    End Function
+
+    Private Function LeggiDataBaseConsegna(ByVal valore As Object,
+                                           ByVal riferimento As String) As Date
+        If TypeOf valore Is DateTime Then Return CType(valore, DateTime).Date
+        If TypeOf valore Is Double Then Return DateTime.FromOADate(CDbl(valore)).Date
+
+        Dim data As DateTime
+        If valore IsNot Nothing AndAlso valore IsNot DBNull.Value AndAlso
+           DateTime.TryParse(NTSCStr(valore), CultureInfo.GetCultureInfo("it-IT"),
+                             DateTimeStyles.None, data) Then Return data.Date
+
+        Throw New Exception("Data non valida nella colonna H per l'impegno " & riferimento & ".")
     End Function
 
     Private Function ValoreTesto(ByVal riga As DataRow, ByVal indice As Integer) As String
