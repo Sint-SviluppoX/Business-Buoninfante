@@ -1,6 +1,7 @@
 Imports System.Data
 Imports NTSInformatica.CLN__STD
 Imports System.Globalization
+Imports System.Collections.Generic
 Imports System
 Public Class CLFVEBOLL
     Inherits CLEVEBOLL
@@ -16,6 +17,10 @@ Public Class CLFVEBOLL
     End Property
     Public Overrides Function AfterColUpdate_CORPO_ec_quant(sender As Object, e As DataColumnChangeEventArgs) As Boolean
         Try
+
+            'Provo ad aggiornare il campo nel piede.
+            AggiornaPostiLettoCalcolati()
+
             Dim Tmp As Boolean = MyBase.AfterColUpdate_CORPO_ec_quant(sender, e)
             'Calcolo il volume (Pers. Alfy 25-03-21)
             'If Not IsNothing(dttArti) Then e.Row!ec_hhvol = NTSCDec(e.ProposedValue) * NTSCDec(dttArti.Rows(0)!ar_volume)
@@ -34,6 +39,60 @@ Public Class CLFVEBOLL
             '--------------------------------------------------------------
         End Try
     End Function
+    'Ricalcola il piede da tutte le righe per non sommare due volte una riga rivisitata.
+    Public Overridable Function AggiornaPostiLettoCalcolati() As Boolean
+        Try
+            If dsShared Is Nothing OrElse Not dsShared.Tables.Contains("CORPO") OrElse
+               dttET Is Nothing OrElse dttET.Rows.Count = 0 Then Return False
+
+            Dim corpo As DataTable = dsShared.Tables("CORPO")
+            Dim campoTestata As String = "et_hhPostiLettoCalcolati"
+            If Not dttET.Columns.Contains(campoTestata) Then
+                campoTestata = "tm_hhPostiLettoCalcolati"
+                If Not dttET.Columns.Contains(campoTestata) Then Return False
+            End If
+
+            Dim codici As New HashSet(Of String)(StringComparer.OrdinalIgnoreCase)
+            For Each riga As DataRow In corpo.Rows
+                If riga.RowState = DataRowState.Deleted Then Continue For
+                Dim codice As String = NTSCStr(riga!ec_codart).Trim()
+                If codice <> "" Then codici.Add(codice)
+            Next
+
+            Dim postiPerArticolo As New Dictionary(Of String, Decimal)(StringComparer.OrdinalIgnoreCase)
+            If codici.Count > 0 Then
+                Dim articoli As DataTable = oClhBoll.GetPostiLettoArticoli(
+                    strDittaCorrente, New List(Of String)(codici))
+                If articoli Is Nothing Then Return False
+                For Each articolo As DataRow In articoli.Rows
+                    Dim codice As String = NTSCStr(articolo!ar_codart).Trim()
+                    If codice <> "" AndAlso Not articolo.IsNull("ar_hhPostiLetto") Then
+                        postiPerArticolo(codice) = NTSCDec(articolo!ar_hhPostiLetto)
+                    End If
+                Next
+            End If
+
+            Dim totale As Decimal = 0D
+            For Each riga As DataRow In corpo.Rows
+                If riga.RowState = DataRowState.Deleted Then Continue For
+                Dim codice As String = NTSCStr(riga!ec_codart).Trim()
+                Dim postiLetto As Decimal
+                If codice <> "" AndAlso postiPerArticolo.TryGetValue(codice, postiLetto) AndAlso
+                   Not riga.IsNull("ec_quant") Then
+                    totale += NTSCDec(riga!ec_quant) * postiLetto
+                End If
+            Next
+            totale = Decimal.Round(totale, 2, MidpointRounding.AwayFromZero)
+            If NTSCDec(dttET.Rows(0)(campoTestata)) <> totale Then
+                dttET.Rows(0)(campoTestata) = totale
+            End If
+            Return True
+        Catch ex As Exception
+            CLN__STD.GestErr(ex, Me, "")
+            Return False
+        End Try
+    End Function
+
     Public Overridable Function CalcolaTotaleVolume() As Decimal
         Try
             Dim TmpTotaleVolume As Decimal = 0
@@ -116,6 +175,7 @@ Public Class CLFVEBOLL
                 If evnt.RetValue = ThMsg.RETVALUE_NO Then Return False
             End If
             'Standard
+            If strState <> "D" Then AggiornaPostiLettoCalcolati()
             TmpRis = MyBase.SalvaDocumento(strState)
             'Se il "SalvaDocumento" è ok e sto cancellando un carico di produzione proveniente da RFID aggiorno il DB condiviso dicendo che l'RFID usato per la generazione automatica non sarà più disponibile poichè il documento che era stato creato da esso non esiste più.
             If TmpRis AndAlso strState = "D" And TmpTipoDoc = "T" AndAlso IsDocDaRFid Then

@@ -1,5 +1,6 @@
 ﻿Imports System.Data
 Imports System.Data.Common
+Imports System.Collections.Generic
 Imports NTSInformatica.CLN__STD
 
 Imports System
@@ -9,6 +10,23 @@ Imports System.Globalization
 
 Public Class CLHVEBOLL
     Inherits CLDVEBOLL
+    Public Overridable Function GetPostiLettoArticoli(ByVal strDitta As String,
+                                                       ByVal codici As List(Of String)) As System.Data.DataTable
+        Try
+            If codici Is Nothing OrElse codici.Count = 0 Then Return New System.Data.DataTable()
+            Dim valori As New List(Of String)()
+            For Each codice As String In codici
+                valori.Add(CStrSQL(codice))
+            Next
+            Dim strSQL As String = "SELECT ar_codart, ar_hhPostiLetto FROM ARTICO" &
+                                   " WHERE codditt = " & CStrSQL(strDitta) &
+                                   " AND ar_codart IN (" & String.Join(",", valori.ToArray()) & ")"
+            Return OpenRecordset(strSQL, CLE__APP.DBTIPO.DBAZI)
+        Catch ex As Exception
+            CLN__STD.GestErr(ex, Me, "")
+            Return Nothing
+        End Try
+    End Function
     Dim SqlConn As SqlConnection = Nothing
     Dim SqlComm As SqlCommand = Nothing
     Dim SqlDA As SqlDataAdapter = Nothing

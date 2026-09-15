@@ -15,8 +15,12 @@ Public Class FROORGSOR
   Public WithEvents edet_hhtotpl As NTSInformatica.NTSTextBoxNum
   Public WithEvents lbet_hhtotpl As NTSInformatica.NTSLabel
   Public WithEvents ec_hhpl As NTSInformatica.NTSGridColumn
+  Public WithEvents fm_hhPostiLettoCalcolati As NTSInformatica.NTSGroupBox
+  Public WithEvents lb_hhPostiLettoCalcolati As NTSInformatica.NTSLabel
+  Public WithEvents ed_hhPostiLettoCalcolati As NTSInformatica.NTSTextBoxNum
   Public WithEvents tlb_hhImportaImpegni As NTSInformatica.NTSBarButtonItem
   Private Shared strUltimaCartellaImport As String = ""
+  Private _aggiornamentoPostiLettoInCorso As Boolean = False
   Public Property oClfGsor() As CLFORGSOR
     Get
       If _oClfGsor Is Nothing Then _oClfGsor = CType(oCleGsor, CLFORGSOR)
@@ -28,6 +32,29 @@ Public Class FROORGSOR
   End Property
   Public Overrides Sub InitializeComponent()
     MyBase.InitializeComponent()
+    Me.fm_hhPostiLettoCalcolati = New NTSInformatica.NTSGroupBox()
+    Me.lb_hhPostiLettoCalcolati = New NTSInformatica.NTSLabel()
+    Me.ed_hhPostiLettoCalcolati = New NTSInformatica.NTSTextBoxNum()
+    Me.fm_hhPostiLettoCalcolati.Name = "fm_hhPostiLettoCalcolati"
+    Me.fm_hhPostiLettoCalcolati.Text = "POSTI LETTO"
+    Me.fm_hhPostiLettoCalcolati.Tile = True
+    Me.fm_hhPostiLettoCalcolati.TileIndex = 1
+    Me.fm_hhPostiLettoCalcolati.Margin = New System.Windows.Forms.Padding(4)
+    Me.fm_hhPostiLettoCalcolati.Size = New System.Drawing.Size(200, 80)
+    Me.lb_hhPostiLettoCalcolati.Name = "lb_hhPostiLettoCalcolati"
+    Me.lb_hhPostiLettoCalcolati.Text = "Posti Letto Calcolati"
+    Me.lb_hhPostiLettoCalcolati.BackColor = System.Drawing.Color.Transparent
+    Me.lb_hhPostiLettoCalcolati.Location = New System.Drawing.Point(4, 24)
+    Me.lb_hhPostiLettoCalcolati.Size = New System.Drawing.Size(188, 20)
+    Me.lb_hhPostiLettoCalcolati.NTSBordeStyle = NTSInformatica.NTSLabel.NTSBorderStyle.FieldCaption
+    Me.ed_hhPostiLettoCalcolati.Name = "ed_hhPostiLettoCalcolati"
+    Me.ed_hhPostiLettoCalcolati.Location = New System.Drawing.Point(4, 48)
+    Me.ed_hhPostiLettoCalcolati.Size = New System.Drawing.Size(88, 20)
+    Me.ed_hhPostiLettoCalcolati.Properties.AutoHeight = False
+    Me.fm_hhPostiLettoCalcolati.Controls.Add(Me.lb_hhPostiLettoCalcolati)
+    Me.fm_hhPostiLettoCalcolati.Controls.Add(Me.ed_hhPostiLettoCalcolati)
+    Me.flAltro.Controls.Add(Me.fm_hhPostiLettoCalcolati)
+    Me.flAltro.Controls.SetChildIndex(Me.fm_hhPostiLettoCalcolati, 1)
     Me.tlb_hhImportaImpegni = New NTSInformatica.NTSBarButtonItem()
     Me.NtsBarManager1.Items.AddRange(New DevExpress.XtraBars.BarItem() {Me.tlb_hhImportaImpegni})
     Me.NtsBarManager1.MaxItemId = 214
@@ -46,6 +73,7 @@ Public Class FROORGSOR
   Public Overrides Sub InitControls()
     MyBase.InitControls()
     Try
+      ed_hhPostiLettoCalcolati.NTSSetParam(oMenu, "Posti Letto Calcolati", "0.00")
       edet_hhtotvol = CType(NTSFindControlByName(Me, "edet_hhtotvol"), NTSTextBoxNum)
       lbet_hhtotvol = CType(NTSFindControlByName(Me, "lbet_hhtotvol"), NTSLabel)
       ec_hhvol = grvRighe.NTSGetColumnByName("ec_hhvol")
@@ -68,24 +96,30 @@ Public Class FROORGSOR
       '-------------------------------------------------
     End Try
   End Sub
-  Public Overrides Sub FRMORGSOR_Load(sender As Object, e As EventArgs)
-    Try
-      MyBase.FRMORGSOR_Load(sender, e)
-      edet_hhtotvol.Enabled = False
-      ec_hhvol.Enabled = False
-      'ec_hhisetrfid.Visible = CBool(IIf(cbTipoDoc.SelectedValue.ToString <> "H", False, True))
-      lbet_hhtotvol.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-      edet_hhtotpn.Enabled = False
-      ec_hhpn.Enabled = False
-      lbet_hhtotpn.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-      edet_hhtotpl.Enabled = False
-      ec_hhpl.Enabled = False
-      lbet_hhtotpl.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Catch ex As Exception
-      CLN__STD.GestErr(ex, Me, "")
-    End Try
+  Public Overrides Sub Bindcontrols()
+    MyBase.Bindcontrols()
+        ed_hhPostiLettoCalcolati.NTSDbField = "TESTA.et_hhPostiLettoCalcolati"
+        NTSFormAddDataBinding(dcGsor, fm_hhPostiLettoCalcolati)
   End Sub
-  Public Overrides Sub cbTipoDoc_SelectedIndexChanged(sender As Object, e As EventArgs)
+    Public Overrides Sub FRMORGSOR_Load(sender As Object, e As EventArgs)
+        Try
+            MyBase.FRMORGSOR_Load(sender, e)
+            ed_hhPostiLettoCalcolati.Enabled = False
+            edet_hhtotvol.Enabled = False
+            ec_hhvol.Enabled = False
+            'ec_hhisetrfid.Visible = CBool(IIf(cbTipoDoc.SelectedValue.ToString <> "H", False, True))
+            lbet_hhtotvol.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+            edet_hhtotpn.Enabled = False
+            ec_hhpn.Enabled = False
+            lbet_hhtotpn.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+            edet_hhtotpl.Enabled = False
+            ec_hhpl.Enabled = False
+            lbet_hhtotpl.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Catch ex As Exception
+            CLN__STD.GestErr(ex, Me, "")
+        End Try
+    End Sub
+    Public Overrides Sub cbTipoDoc_SelectedIndexChanged(sender As Object, e As EventArgs)
     Try
       MyBase.cbTipoDoc_SelectedIndexChanged(sender, e)
       'Se Ordine di Produzione abilito, in griglia, il campo/colonna pers. che indica se � una riga che dovr� andare nelle etichette rfid
@@ -105,14 +139,24 @@ Public Class FROORGSOR
   End Sub
 #Region "Importazione impegni"
 
-  Private Sub AggiornaPulsanteImportaDaNumero(sender As Object, e As EventArgs) Handles edNumDoc.Validated
-    Try
-      AggiornaPulsanteImporta()
-    Catch ex As Exception
-      CLN__STD.GestErr(ex, Me, "")
-    End Try
-  End Sub
-  Public Overridable Sub tlb_hhImportaImpegni_ItemClick(ByVal sender As Object,
+    Public Overridable Sub edNumDoc_Validated(sender As Object, e As EventArgs) Handles edNumDoc.Validated
+        Try
+
+            If edNumDoc.TextInt = 0 Then
+                Me.tlb_hhImportaImpegni.Visible = True
+            Else
+                Me.tlb_hhImportaImpegni.Visible = False
+            End If
+
+        Catch ex As Exception
+            '-------------------------------------------------
+            CLN__STD.GestErr(ex, Me, "")
+            '-------------------------------------------------	
+        End Try
+
+    End Sub
+
+    Public Overridable Sub tlb_hhImportaImpegni_ItemClick(ByVal sender As Object,
     ByVal e As DevExpress.XtraBars.ItemClickEventArgs) Handles tlb_hhImportaImpegni.ItemClick
     Dim frmProgress As BOORGSOR_ProgressView = Nothing
     Dim importatore As HH_ImportatoreImpegni = Nothing

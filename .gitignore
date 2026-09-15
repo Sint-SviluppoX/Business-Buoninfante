@@ -362,7 +362,9 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-# Artefatti custom versionati e aggiornati da Directory.Build.targets
-!Distribuzione/
-!Distribuzione/*.dll
-!Distribuzione/*.pdb
+# Cartelle e automazione locali del progetto
+/TEST/
+/Buscube/
+/Directory.Build.targets
+/Distribuzione/
+/sql/

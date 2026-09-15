@@ -313,7 +313,7 @@ Friend Class HH_ImportatoreImpegni
                     documento = New HH_DocumentoImpegnoImport() With {
             .Riferimento = riferimento,
             .Cliente = ValoreTesto(rigaExcel, 0).Trim(),                  'Colonna A
-            .CodDest = NTSCInt(ValoreTesto(rigaExcel, 4))                'Colonna E
+            .CodDest = NTSCInt(ValoreTesto(rigaExcel, 5))                'Colonna F
           }
                     perRiferimento.Add(riferimento, documento)
                     documenti.Add(documento)

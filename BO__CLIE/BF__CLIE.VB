@@ -22,50 +22,54 @@ Public Class CLF__CLIE
 #Region "Controllo codice destinazione Excel"
 
     Public Overrides Function DesgTestPreSalva() As Boolean
-    Try
-      NormalizzaCampiDestinazione()
+        Try
 
-      If Not MyBase.DesgTestPreSalva() Then Return False
+            NormalizzaCampiDestinazione()
 
-      Dim righe() As DataRow = dttDestdivEx.Select(
-        Nothing, Nothing, DataViewRowState.Added Or DataViewRowState.ModifiedCurrent)
+            If Not MyBase.DesgTestPreSalva() Then Return False
 
-      For Each riga As DataRow In righe
-        If riga.IsNull("dd_hhCodDestExc") Then Continue For
+            'Verifica sia le righe ancora da salvare sia le destinazioni già presenti nel database.
+            Dim righe() As DataRow = dttDestdivEx.Select(
+                    Nothing, Nothing, DataViewRowState.Added Or DataViewRowState.ModifiedCurrent)
 
-        Dim codiceEsterno As Integer = NTSCInt(riga!dd_hhCodDestExc)
-        If codiceEsterno <= 0 Then Continue For
+            For Each riga As DataRow In righe
+                If riga.IsNull("dd_hhCodDestExc") Then Continue For
 
-        Dim locale As DataRow = TrovaDuplicatoLocale(riga, codiceEsterno)
-        If locale IsNot Nothing Then
-          SegnalaDuplicato(codiceEsterno, NTSCStr(locale!codditt),
-                           NTSCInt(locale!dd_conto), NTSCInt(locale!dd_coddest))
-          Return False
-        End If
+                Dim codiceEsterno As Integer = NTSCInt(riga!dd_hhCodDestExc)
+                If codiceEsterno <= 0 Then Continue For
 
-        Dim trovato As DataTable = oClhClie.GetDestinazioneConCodiceEsterno(
-          codiceEsterno, NTSCStr(riga!codditt), NTSCInt(riga!dd_conto), NTSCInt(riga!dd_coddest))
-        If trovato IsNot Nothing AndAlso trovato.Rows.Count > 0 Then
-          SegnalaDuplicato(codiceEsterno, NTSCStr(trovato.Rows(0)!codditt),
-                           NTSCInt(trovato.Rows(0)!dd_conto), NTSCInt(trovato.Rows(0)!dd_coddest))
-          Return False
-        End If
-      Next
+                Dim locale As DataRow = TrovaDuplicatoLocale(riga, codiceEsterno)
+                If locale IsNot Nothing Then
+                    SegnalaDuplicato(codiceEsterno, NTSCStr(locale!codditt),
+                                    NTSCInt(locale!dd_conto), NTSCInt(locale!dd_coddest))
+                    Return False
+                End If
 
-      Return True
-    Catch ex As Exception
-      CLN__STD.GestErr(ex, Me, "")
-      Return False
-    End Try
-  End Function
+                Dim trovato As DataTable = oClhClie.GetDestinazioneConCodiceEsterno(
+                    codiceEsterno, NTSCStr(riga!codditt), NTSCInt(riga!dd_conto), NTSCInt(riga!dd_coddest))
+
+                If trovato IsNot Nothing AndAlso trovato.Rows.Count > 0 Then
+                    SegnalaDuplicato(codiceEsterno, NTSCStr(trovato.Rows(0)!codditt),
+                                    NTSCInt(trovato.Rows(0)!dd_conto), NTSCInt(trovato.Rows(0)!dd_coddest))
+                    Return False
+                End If
+            Next
+
+            Return True
+        Catch ex As Exception
+            CLN__STD.GestErr(ex, Me, "")
+            Return False
+        End Try
+    End Function
 
 #End Region
 
 
 #Region "Utils"
 
-    Private Sub NormalizzaCampiDestinazione()
+    Private Sub NormalizzaCampiDestinazione() 'Assegno null nel caso di valori non accettati.
         Try
+
             Dim righe() As DataRow = dttDestdivEx.Select(
               Nothing, Nothing, DataViewRowState.Added Or DataViewRowState.ModifiedCurrent)
 
@@ -74,7 +78,6 @@ Public Class CLF__CLIE
                    NTSCInt(riga!dd_hhCodDestExc) <= 0 Then
                     riga!dd_hhCodDestExc = DBNull.Value
                 End If
-
                 If Not riga.IsNull("dd_hhGiornoConsegna") Then
                     Dim giorno As String = NTSCStr(riga!dd_hhGiornoConsegna).Trim()
                     If giorno = "" OrElse giorno = "0" Then
@@ -82,6 +85,7 @@ Public Class CLF__CLIE
                     End If
                 End If
             Next
+
         Catch ex As Exception
             CLN__STD.GestErr(ex, Me, "")
             Throw
@@ -91,11 +95,13 @@ Public Class CLF__CLIE
     Private Function TrovaDuplicatoLocale(ByVal corrente As DataRow,
                                           ByVal codiceEsterno As Integer) As DataRow
         Try
+
             For Each riga As DataRow In dttDestdivEx.Rows
                 If riga.RowState = DataRowState.Deleted OrElse Object.ReferenceEquals(riga, corrente) Then Continue For
                 If Not riga.IsNull("dd_hhCodDestExc") AndAlso
                    NTSCInt(riga!dd_hhCodDestExc) = codiceEsterno Then Return riga
             Next
+
             Return Nothing
         Catch ex As Exception
             CLN__STD.GestErr(ex, Me, "")
