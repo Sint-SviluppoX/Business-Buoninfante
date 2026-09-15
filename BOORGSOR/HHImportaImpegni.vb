@@ -23,7 +23,8 @@ End Class
 
 'Esito sintetico mostrato al termine dell'importazione.
 Friend Class HH_EsitoImportazioneImpegni
-    Public Property DocumentiSalvati As Integer
+  Public Property DocumentiSalvati As Integer
+  Public Property DocumentiSaltati As Integer
     Public ReadOnly Property ErroriDocumento As New List(Of String)
 End Class
 
@@ -72,6 +73,17 @@ Friend Class HH_ImportatoreImpegni
 
             For indiceDocumento As Integer = 0 To documenti.Count - 1
                 Dim documento As HH_DocumentoImpegnoImport = documenti(indiceDocumento)
+                Dim esistenti As DataTable = _oClfGsor.GetOrdiniPerRiferimento(documento.Riferimento)
+                If esistenti Is Nothing Then
+                    esito.ErroriDocumento.Add(documento.Riferimento &
+                                              ": verifica degli ordini esistenti non riuscita")
+                    Continue For
+                End If
+                If esistenti.Rows.Count > 0 AndAlso
+                   Not ConfermaReimportazione(documento.Riferimento, esistenti) Then
+                    esito.DocumentiSaltati += 1
+                    Continue For
+                End If
                 Dim motivo As String = ""
                 If CreaESalvaDocumento(documento, indiceDocumento + 1, documenti.Count, motivo) Then
                     esito.DocumentiSalvati += 1
@@ -155,6 +167,26 @@ Friend Class HH_ImportatoreImpegni
 #End Region
 
 #Region "Utils"
+
+    Private Function ConfermaReimportazione(ByVal riferimento As String,
+                                            ByVal esistenti As DataTable) As Boolean
+        Dim documenti As New List(Of String)()
+        For Each riga As DataRow In esistenti.Rows
+            Dim serie As String = NTSCStr(riga!td_serie).Trim()
+            If serie = "" Then serie = "(vuota)"
+            documenti.Add("- Tipo " & NTSCStr(riga!td_tipork).Trim() &
+                          ", anno " & NTSCStr(riga!td_anno) &
+                          ", serie " & serie &
+                          ", numero " & NTSCStr(riga!td_numord) &
+                          ", conto " & NTSCStr(riga!td_conto))
+        Next
+
+        Dim messaggio As String = "Il riferimento " & riferimento &
+                                 " è già presente nei seguenti documenti:" & vbCrLf &
+                                 String.Join(vbCrLf, documenti.ToArray()) & vbCrLf & vbCrLf &
+                                 "Sei sicuro di voler reimportare questo ordine?"
+        Return _oApp.MsgBoxInfoYesNo_DefNo(messaggio) = DialogResult.Yes
+    End Function
 
     Private Sub RisolviDestinazione(ByVal conto As Integer,
                                   ByVal codDestEsterno As Integer,

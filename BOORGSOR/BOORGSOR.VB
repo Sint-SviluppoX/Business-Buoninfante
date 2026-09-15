@@ -242,13 +242,16 @@ Public Class FROORGSOR
         Return
       End If
 
+      Dim riepilogo As String = "Impegni salvati: " & esito.DocumentiSalvati.ToString() & "."
+      If esito.DocumentiSaltati > 0 Then
+        riepilogo &= " Reimportazioni annullate: " & esito.DocumentiSaltati.ToString() & "."
+      End If
       If esito.ErroriDocumento.Count = 0 Then
-        oApp.MsgBoxInfo("Importazione completata. Impegni salvati: " &
-                        esito.DocumentiSalvati.ToString() & ".")
+        oApp.MsgBoxInfo("Importazione completata. " & riepilogo)
         Return
       End If
 
-      Dim messaggio As String = "Impegni salvati: " & esito.DocumentiSalvati.ToString() & "." &
+      Dim messaggio As String = riepilogo &
                                 vbCrLf & "Documenti non salvati:" & vbCrLf &
                                 String.Join(vbCrLf, esito.ErroriDocumento.ToArray())
       oApp.MsgBoxExclamation(messaggio)

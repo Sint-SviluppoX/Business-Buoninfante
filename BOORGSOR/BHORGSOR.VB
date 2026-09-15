@@ -7,6 +7,20 @@ Imports System
 Public Class CLHORGSOR
   Inherits CLDORGSOR
 
+  Public Overridable Function GetOrdiniPerRiferimento(ByVal strDitta As String,
+                                                      ByVal riferimento As String) As DataTable
+    Try
+      Dim strSQL As String = "SELECT td_tipork, td_anno, td_serie, td_numord, td_conto" &
+                             " FROM TESTORD WHERE codditt = " & CStrSQL(strDitta) &
+                             " AND td_riferim = " & CStrSQL(riferimento.Trim()) &
+                             " ORDER BY td_anno DESC, td_numord DESC"
+      Return OpenRecordset(strSQL, CLE__APP.DBTIPO.DBAZI)
+    Catch ex As Exception
+      CLN__STD.GestErr(ex, Me, "")
+      Return Nothing
+    End Try
+  End Function
+
   Public Overridable Function GetPostiLettoArticoli(ByVal strDitta As String,
                                                     ByVal codici As List(Of String)) As DataTable
     Try

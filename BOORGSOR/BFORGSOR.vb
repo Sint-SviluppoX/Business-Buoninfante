@@ -15,6 +15,15 @@ Public Class CLFORGSOR
       _oClhGsor = value
     End Set
   End Property
+  Public Overridable Function GetOrdiniPerRiferimento(ByVal riferimento As String) As DataTable
+    Try
+      Return oClhGsor.GetOrdiniPerRiferimento(strDittaCorrente, riferimento)
+    Catch ex As Exception
+      CLN__STD.GestErr(ex, Me, "")
+      Return Nothing
+    End Try
+  End Function
+
   Public Overridable Function GetDestinazioneImport(ByVal strCodDestEsterno As String,
                                                     ByVal nConto As Integer) As DataTable
     Try
