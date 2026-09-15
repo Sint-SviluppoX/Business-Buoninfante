@@ -241,7 +241,6 @@ Friend Class HH_ImportatoreImpegni
 
             Dim giorniDaAggiungere As Integer =
         (CInt(giornoSettimana) - CInt(dataBase.DayOfWeek) + 7) Mod 7
-            If giorniDaAggiungere = 0 Then giorniDaAggiungere = 7
             Return dataBase.Date.AddDays(giorniDaAggiungere)
         Catch ex As Exception
             CLN__STD.GestErr(ex, Me, "")
