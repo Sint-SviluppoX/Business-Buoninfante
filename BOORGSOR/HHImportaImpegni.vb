@@ -239,9 +239,9 @@ Friend Class HH_ImportatoreImpegni
                 Case Else : Return Nothing
             End Select
 
-            Dim giorniDaAggiungere As Integer =
-        (CInt(giornoSettimana) - CInt(dataBase.DayOfWeek) + 7) Mod 7
-            Return dataBase.Date.AddDays(giorniDaAggiungere)
+            Dim giorniDaSottrarre As Integer =
+        (CInt(dataBase.DayOfWeek) - CInt(giornoSettimana) + 7) Mod 7
+            Return dataBase.Date.AddDays(-giorniDaSottrarre)
         Catch ex As Exception
             CLN__STD.GestErr(ex, Me, "")
             Return Nothing
