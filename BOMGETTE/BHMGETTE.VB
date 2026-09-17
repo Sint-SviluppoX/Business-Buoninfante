@@ -289,7 +289,6 @@ Public Class CLHMGETTE
 #End Region
 
 #Region "Dati QR etichette"
-
     Public Overridable Function OttieniDatiPerQR(ByVal strDitta As String,
                                                   ByVal lInstId As Integer) As DataTable
         Try
@@ -317,7 +316,6 @@ Public Class CLHMGETTE
             Return Nothing
         End Try
     End Function
-
 #End Region
 
 End Class

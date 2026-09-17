@@ -140,7 +140,6 @@
   <ItemGroup>
     <Compile Include="BHORGSOR.VB" />
     <Compile Include="BFORGSOR.vb" />
-    <Compile Include="HHImportaImpegni.vb" />
     <Compile Include="BOORGSOR_ProgressView.Designer.vb">
       <DependentUpon>BOORGSOR_ProgressView.vb</DependentUpon>
     </Compile>
@@ -168,7 +167,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="THIRD-PARTY-NOTICES.md" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>

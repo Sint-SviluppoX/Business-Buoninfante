@@ -6,6 +6,7 @@ TEST/Arcproc_i18ntext.modx
 /.tmp/
 /TEST/
 /Buscube/
+/Safe/
 *.sln
 *.slnx
 **/bin/
